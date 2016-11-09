@@ -14,7 +14,7 @@ class Room {
 
     getUserNameList(){
         var list = [];
-        for(userId in this._users){
+        for(var userId in this._users){
             list.push(this._users[userId].name)
         }
         return list;
