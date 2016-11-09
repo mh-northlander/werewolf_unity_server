@@ -14,6 +14,8 @@ class User{
 
     set alive(alive){ this._alive = alive; }
     get alive(){ return this._alive; }
+
+    get socketId(){ return this._socketId; }
 }
 
 module.exports = {
