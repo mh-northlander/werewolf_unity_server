@@ -2,9 +2,7 @@
 model = require('./../model')
 
 // exports
-module.exports = {
-    Room: Room,
-}
+module.exports = Room
 
 // Room
 function Room(roomId){
@@ -17,7 +15,7 @@ function Room(roomId){
 
     return room;
 }
-//// prototype checker (not needed now)
+//// prototype checker (not necessary now)
 // Room.isRoom = function(obj,type){
 //     if(!Room.prototype.isPrototypeOf(obj)){
 //         return false;
@@ -36,8 +34,7 @@ Room.prototype = {
         if(this.masterId == null){
             this.masterId = userId;
         }
-        console.log(model.user.isUser(user,false))
-        this.users[userId] = user; // should check if isUser(user)
+        this.users[userId] = user; // maybe we should check if isUser(user)
     },
     removeUser: function(userId){
         if(userId == this.masterId){
@@ -48,7 +45,14 @@ Room.prototype = {
     },
 
     // info
-    getUserNameList(){
+    masterUser: function(){
+        if(!this.users == {}){
+            return this.users[this.masterId];
+        }
+        // return {};
+    },
+
+    getUserNameList: function(){
         var res = [];
         for(var userId in this.users){
             res.push(this.users[userId].name)

@@ -2,9 +2,7 @@
 // model = require('./../model');
 
 // exports
-module.exports = {
-    User: User,
-}
+module.exports = User;
 
 // User
 function User(userName, socketId){

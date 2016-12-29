@@ -1,24 +1,29 @@
-module.exports = {
-    // role
-    roleVillager : "villager",
-    roleWerewolf : "werewolf",
-    roleSeer     : "seer",
-    roleMedium   : "medium",
-    roleGuard    : "guard",
+// team
+exports.team = {
+    Human    : "teamHuman",
+    Werewolf : "teamWerewolf",
+    Other    : "teamOther",
+}
 
-    // team
-    teamHuman : "human",
-    teamWerewolf : "werewolf",
-    teamOther : "other",
+// fromSeer
+exports.fromSeer = {
+    Human       : "fromSeerHuman",
+    Wereeolfolf : "fromSeerWerewolf",
+    Other       : "fromSeerOther",    // for future impliment
+}
 
+// fromMedium
+exports.fromMedium = {
+    Human       : "fromMediumHuman",
+    Wereeolfolf : "fromMediumWerewolf",
+    Other       : "fromMediumOther",    // for future impliment
+}
 
-    // fromSeer
-    fromSeerHuman       : "human",
-    fromSeerWereeolfolf : "werewolf",
-    fromSeerOther       : "other",    // for future impliment
-
-    // fromMedium
-    fromMediumHuman       : "human",
-    fromMediumWereeolfolf : "werewolf",
-    fromMediumOther       : "other",    // for future impliment
+// role
+exports.role = {
+    Villager : "roleVillager",
+    Werewolf : "roleWerewolf",
+    Seer     : "roleSeer",
+    Medium   : "roleMedium",
+    Guard    : "roleGuard",
 }

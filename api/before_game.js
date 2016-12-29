@@ -1,13 +1,22 @@
+// requires
 model = require('./../model')
+
+// exports
+module.exports = {
+    JoinRoom: joinRoom,
+    ExitRoom: exitRoom,
+    ChangeRule:changeRule,
+    StartGame: startGame,
+}
+
 
 // join room
 function joinRoom(io, socketId){
     return function(data){
-        room.addUser(data.userId, new model.user.User(data.name, socketId));
+        room.addUser(data.userId, new model.User(data.name, socketId));
         io.emit('joinRoom', {value : room.getUserNameList()});
     }
 }
-
 
 // exit room
 function exitRoom(io){
@@ -31,14 +40,7 @@ function startGame(io){
 }
 
 //// vars
-var room = new model.room.Room(0)
+var room = new model.Room(0);
+
 // userInfoMap
 var userInfoMap = {};
-
-// export
-module.exports = {
-    JoinRoom: joinRoom,
-    ExitRoom: exitRoom,
-    ChangeRule:changeRule,
-    StartGame: startGame,
-}
