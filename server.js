@@ -1,11 +1,8 @@
-var app  = require('express')();
-var http = require('http').Server(app);
-var io   = require('socket.io')(http);
+var server = require('http').createServer(doReq);
+var io = require('socket.io')(server);
 
-http.listen(3000)
+server.listen(3000) // connect
 
-app.get("/", doReq);
-// var server = http.createServer(doReq).listen(portNum);
 
 // socket
 var bg = require('./api/before_game')
@@ -17,7 +14,7 @@ var bg = require('./api/before_game')
   io.to('roomName').emit(~~)
 
   io.to(socket.id).emit(~~)
- */
+*/
 
 io.on('connection', function(socket) {
     io.emit('connectionEstablished', {}) // 通知

@@ -3,7 +3,7 @@ model = require('./../model')
 // join room
 function joinRoom(io, socketId){
     return function(data){
-        room.joinUser(data.userId, new model.user.User(data.name, socketId));
+        room.addUser(data.userId, new model.user.User(data.name, socketId));
         io.emit('joinRoom', {value : room.getUserNameList()});
     }
 }

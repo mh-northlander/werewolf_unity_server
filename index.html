@@ -43,7 +43,7 @@
       $("form").submit(function(e){
       var message = $("#msgForm").val();
       $("#msgForm").val('');
-      socket.emit("joinRoom", {userId : Math.random().toString(36).slice(-8), name: Math.random().toString(36).slice(-4)});
+      socket.emit("joinRoom", {userId : Math.random().toString(36).slice(-8), name: message});
       e.preventDefault();
       });
 

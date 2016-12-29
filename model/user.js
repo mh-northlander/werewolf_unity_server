@@ -1,23 +1,28 @@
-class User{
-    constructor(name, socketId){
-        this._name = name;
-        this._role = "none";
-        this._alive = true;
-        this._socketId = socketId;
-    }
+// requires
+// model = require('./../model');
 
-    set name(name){ this._name = name; }
-    get name(){ return this._name; }
-
-    set role(role){ this._role = role; }
-    get role(){ return this._role; }
-
-    set alive(alive){ this._alive = alive; }
-    get alive(){ return this._alive; }
-
-    get socketId(){ return this._socketId; }
-}
-
+// exports
 module.exports = {
     User: User,
 }
+
+// User
+function User(userName, socketId){
+    var user = Object.create(User.prototype);
+
+    user.socketId = socketId;
+    user.name = userName;
+
+    user.alive = true;
+    user.role = "";
+
+    return user;
+}
+// // prototype checker よくわからｎ
+// User.isUser = function(obj,type){
+//     if(!User.prototype.isPrototypeOf(obj)){
+//         return false;
+//     }
+//     return type ? obj.type === type : true;
+// };
+User.prototype = {};
