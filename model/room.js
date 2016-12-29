@@ -36,7 +36,6 @@ Room.prototype = {
         if(this.masterId == null){
             this.masterId = userId;
         }
-        console.log(model.user.isUser(user,false))
         this.users[userId] = user; // should check if isUser(user)
     },
     removeUser: function(userId){

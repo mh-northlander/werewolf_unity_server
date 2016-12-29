@@ -26,9 +26,9 @@ function changeRule(io){
 // start game
 function startGame(io){
     return function(data){
-        for(var userId in room._users){
-            var userSocketId = room._users[userId].socketId;
-            var userRole = room._users[userId].role;
+        for(var userId in room.users){
+            var userSocketId = room.users[userId].socketId;
+            var userRole = room.users[userId].role;
             io.to(userSocketId).emit('startGame', {value : userRole});
         }
     }
