@@ -1,5 +1,4 @@
-// requires
-// model = require('./../model');
+// imports
 
 // exports
 module.exports = User;
@@ -16,11 +15,12 @@ function User(userName, socketId){
 
     return user;
 }
-// // prototype checker よくわからｎ
-// User.isUser = function(obj,type){
-//     if(!User.prototype.isPrototypeOf(obj)){
-//         return false;
-//     }
-//     return type ? obj.type === type : true;
-// };
+
 User.prototype = {};
+
+User.isUser = function(obj,type){
+    if(!User.prototype.isPrototypeOf(obj)){
+        return false;
+    }
+    return type ? obj.type === type : true;
+};

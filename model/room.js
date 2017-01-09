@@ -1,5 +1,4 @@
-// requires
-model = require('./../model')
+// imports
 
 // exports
 module.exports = Room
@@ -15,13 +14,7 @@ function Room(roomId){
 
     return room;
 }
-//// prototype checker (not necessary now)
-// Room.isRoom = function(obj,type){
-//     if(!Room.prototype.isPrototypeOf(obj)){
-//         return false;
-//     }
-//     return type ? obj.type === type : true;
-// };
+
 Room.prototype = {
     closeRoom: function(){
         // this func resets itself,
@@ -60,3 +53,10 @@ Room.prototype = {
         return res;
     },
 };
+
+// Room.isRoom = function(obj,type){
+//     if(!Room.prototype.isPrototypeOf(obj)){
+//         return false;
+//     }
+//     return type ? obj.type === type : true;
+// };

@@ -1,8 +1,6 @@
-module.exports = {
-    // class
-    User: require('./user'),
-    Room: require('./room'),
+// class
+exports.User = require('./user')
+exports.Room = require('./room')
 
-    //
-    role: require('./role'),
-};
+//
+exports.role = require('./role/index')
