@@ -11,7 +11,7 @@ Seer.Name = "Seer";
 
 function Seer(){
     var seer = Object.create(Seer.prototype);
-    Object.assign(vil, Role(Seer.Name))
+    Object.assign(seer, Role(Seer.Name))
 
     return seer;
 }

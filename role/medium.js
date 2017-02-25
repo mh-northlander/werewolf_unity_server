@@ -11,7 +11,7 @@ Medium.Name = "Medium";
 
 function Medium(){
     var medium = Object.create(Medium.prototype);
-    Object.assign(vil, Role(Medium.Name))
+    Object.assign(medium, Role(Medium.Name))
 
     return medium;
 }

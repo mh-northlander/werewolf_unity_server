@@ -11,7 +11,7 @@ Werewolf.Name = "Werewolf";
 
 function Werewolf(){
     var wolf = Object.create(Werewolf.prototype);
-    Object.assign(vil, Role(Werewolf.Name))
+    Object.assign(wolf, Role(Werewolf.Name))
 
     return wolf;
 }

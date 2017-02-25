@@ -11,7 +11,7 @@ Guard.Name = "Guard";
 
 function Guard(){
     var guard = Object.create(Guard.prototype);
-    Object.assign(guard, Role(Guard.Name))
+    Object.assign(guard, Role(Guard.Name));
 
     guard.guardingId = null;
 
