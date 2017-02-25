@@ -7,6 +7,7 @@ User  = require('./user');
 Rule  = require('./rule');
 Log   = require('./log');
 
+role = require("../role/");
 
 // Village
 function Village(villageId){
@@ -18,9 +19,10 @@ function Village(villageId){
     village.rule = Rule();
 
     village.phase = Phase();
-    village.actionStack = [];
     village.log = [Log()];
     village.votedStack = {};
+
+    village.actionStack = {};
 
     return village;
 }
@@ -95,25 +97,97 @@ Village.prototype = {
     },
 
     // action
-    listActionCandidates: function(userId){
-        cond = this.users[userId].role.candidateCondition();
-        if(cond.except){
-            cond.except.push(userId);
-        } else {
-            cond.except = [userId];
+    getCandidatesMap: function(){
+        Object.keys(this.users).reduce((ret,userId)=>{
+            if(this.users[userId].alive && this.users[userId].role.actionCandidates){
+                list = this.users[userId].role.actionCandidates(this, userId);
+                if(!list == []){
+                    ret[userId] = list;
+                }
+            }
+            return ret;
+        }, {})
+    },
+    getResultMap: function(){
+        Object.keys(this.users).reduce((ret,userId)=>{
+            if(this.users[userId].alive && this.users[userId].role.actionResult){
+                res = this.users[userId].role.actionResult(this);
+                if(!res == {}){
+                    ret[userId] = res;
+                }
+            }
+            return ret;
+        }, {})
+    },
+    evalActionMorning: function(){
+        if(this.phase.dayCount == 1){ return { deads:[] }; }
+
+        deads = [];
+        // see
+        if(this.actionStack["see"]){
+            for(e of this.actionStack["see"]){
+                deads = deads.concat(this.event.saw(e.subjectUserId, e.objectUserId));
+            }
         }
 
-        return this.listMembersWithCondition(cond)
+        //// bite
+        if(this.actionStack["bite"]){
+            // summarize all bite action
+            summary = {} // objectId -> { powerSum, subjectIds, subjectPower }
+            for(e of this.actionStack["bite"]){
+                if(summary[e.objectId]){ // init
+                    summary[e.objectId] = {
+                        powerSum     : 0,
+                        subjectPower : 0,
+                        subjectIds   : [],
+                    };
+                }
+                summary[e.objectId].powerSum += e.power
+                if       (e.power >  summary[e.objectId].subjectPower){
+                    summary[e.objectId].subjectIds   = [e.subjectId];
+                    summary[e.objectId].subjectPower = e.power;
+                } else if(e.power == summary[e.objectId].subjectPower){
+                    summary[e.objectId].subjectIds.push(e.subjectId);
+                }
+            }
+            // search victim
+            objectIds = [];
+            maxPower = 0;
+            for(objectId in summary){
+                if       (summary[objectId].powerSum >  maxPower){
+                    objectIds = [objectId];
+                    maxPower  = summary[objectId].powerSum;
+                } else if(summary[objectId].powerSum == maxPower){
+                    objectIds.push(objectId);
+                }
+            }
+            // random choice if tie
+            objectId   = objectIds[Math.floor(Math.random() * objectIds.length)];
+            subjectIds = summary[objectId];
+            deads = deads.concat(this.event.bited(
+                subjectIds[Math.floor(Math.random() * subjectIds.length)], objectId));
+        }
+        //
+        return {
+            deads: deads,
+        };
     },
-    addAction: function(subjectUserId, act){
-        // act: {type, userId (target), ~}
 
-        // resp: {subjectUser, objectUser, result:role.common, }
-        return {};
-    },
-    evalAction: function(){
-        // resp: {deads:[userName], }
-        return {};
+    // event
+    event : { // event funcs return dead list [userId]
+        saw: function(subjectUserId, objectUserId, base=[]){
+            return base;
+        },
+        bited: function(subjectUserId, objectUserId, base=[]){
+            return this.event.died(objectUserId, base);
+        },
+        executed: function(objectUserId, base=[]){
+            return this.event.died(objectUserId, base);
+        },
+        died: function(objectUserId, base=[]){
+            this.users[objectUserId].alive = false;
+            return base.concat([objectUserId]);
+        },
     },
 
     // vote
@@ -163,7 +237,7 @@ Village.prototype = {
             if(cond.alive  && !user.alive){ return ret; }
             if(cond.except && cond.except.indexOf(userId) >= 0 ){ return ret; }
 
-            if(cond.notWold && user.role.isWolf){ return ret; }
+            if(cond.notWold && user.role.species==role.common.type.WEREWOLF){ return ret; }
 
             ret.push({
                 userName: user.name,

@@ -7,16 +7,21 @@ module.exports = {
 };
 
 // import
-GamePhaseNight = require('../village/phase').GamePhase.NIGHT;
+shared = require("./shared");
 morning = require("./morning");
+GamePhaseNight = require('../village/phase').GamePhase.NIGHT;
 
 //// listen
 // action
 function action(io, socket, village){
     return function(act){
         userId = village.socketIdToUserId(socket.id);
-        resp = village.addAction(userId, act);
-        io.to(village.users[userId].chatRoom).emit("actionResult", resp);
+        user = village.users[userId];
+
+        resp = user.role.evalActionNight(village, userId, act);
+        if(resp && !resp=={}){
+            io.to(village.users[userId].chatRoom).emit("actionResult", resp);
+        }
     };
 };
 
@@ -24,6 +29,7 @@ function action(io, socket, village){
 function chat(io, socket, village){
     return function(message){
         // TODO
+        // socket.to(chatRoom).emit();
     };
 };
 
@@ -40,9 +46,21 @@ function begin(io, socket, village){
         timeCount: phase.secCount,
     });
 
+    // reset
+    village.actionStack = {};
+
     // action candidates
-    for(var userId in village.users){
-        socket.emit("antionCandidates", village.listActionCandidates(userId));
+    candidatesMap = village.getCandidatesMap()
+    for(userId in candidatesMap){
+        io.to(village.userIdToSocketId(userId)).emit(
+            "actionCandidates", candidatesMap[userId]);
+    }
+
+    // action result (for difinite action)
+    resultMap = village.getResultMap()
+    for(userId in resultMap){
+        io.to(village.userIdToSocketId(userId)).emit(
+            "actionResult", resultMap[userId]);
     }
 
     // timer

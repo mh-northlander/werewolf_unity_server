@@ -7,18 +7,18 @@ Role = require('./role');
 
 
 // werewolf
-Werewolf.Name = "werewolf";
+Werewolf.Name = "Werewolf";
 
 function Werewolf(){
-    var vil = Object.create(Werewolf.prototype);
+    var wolf = Object.create(Werewolf.prototype);
     Object.assign(vil, Role(Werewolf.Name))
 
-    return vil;
+    return wolf;
 }
 
 Werewolf.prototype = {
-    team     : common.type.WEREWOLF,
-    isWolf   : true,
+    team    : common.type.WEREWOLF,
+    species : common.type.WEREWOLF,
 
     chatType  : common.chatType.GROUP,
     chatGroup : "werewolf",
@@ -26,12 +26,29 @@ Werewolf.prototype = {
     fromSeer   : common.type.WEREWOLF,
     fromMedium : common.type.WEREWOLF,
 
-    candidateCondition: ()=>{
-        return {
-            alive: true,
-            notWolf: true,
-        };
+    actionCandidates: function(village, selfId){
+        return village.listMembersWithCondition({
+            alive   : true,
+            notWolf : true,
+            except  : [selfId],
+        })
     },
+
+    evalActionNight: function(village, userId, act){
+        // act: { type:"bite", userId, power }
+        if(!village.actionStack["bite"]){ village.actionStack["bite"] = []; }
+        village.actionStack["bite"].push({
+            subjectId : userId,
+            objectId  : act.userId,
+            power         : act.power,
+        });
+
+        return {
+            wolfName : village.users[userId].name,
+            userName : village.users[act.userId].name,
+            power    : act.power,
+        };
+    }
 }
 
 // isWerewolf

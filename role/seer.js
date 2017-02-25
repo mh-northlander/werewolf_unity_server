@@ -7,31 +7,50 @@ Role = require('./role');
 
 
 // seer
-Seer.Name = "seer";
+Seer.Name = "Seer";
 
 function Seer(){
-    var vil = Object.create(Seer.prototype);
+    var seer = Object.create(Seer.prototype);
     Object.assign(vil, Role(Seer.Name))
 
-    return vil;
+    return seer;
 }
 
 Seer.prototype = {
     team   : common.type.HUMAN,
-    isWolf : false,
+    species : common.type.HUMAN,
 
     fromSeer   : common.type.HUMAN,
     fromMedium : common.type.HUMAN,
 
-    candidateCondition: ()=>{
-        return {
-            alive: true,
-            except: this.actionLog.reduce((ret,val)=>{
+    actionCandidates: function(village, selfId){
+        return village.listMembersWithCondition({
+            alive  : true,
+            except : this.log.reduce((ret,val)=>{
                 ret.push(val.userId);
-                return ret;
-            }, []),
-        };
+                return ret
+            }, [selfId])
+        });
     },
+
+    evalActionNight: function(village, userId, act){
+        // act: { type:"see", userId }
+        // log
+        this.log.push({ userId: act.userId });
+
+        if(!village.actionStack["see"]){ village.actionStack["see"] = []; }
+        village.actionStack["see"].push({
+            subjectUserId : userId,
+            objectUserId  : act.userId,
+        });
+
+        target  = village.users[act.userId];
+        seerRes = target.role.fromSeer;
+        return {
+            userName : target.name,
+            result   : seerRes==common.type.WEREWOLF ? seerRes : commontype.HUMAN,
+        }
+    }
 }
 
 // isSeer

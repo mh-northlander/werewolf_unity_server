@@ -6,19 +6,19 @@ common = require('./common');
 
 
 // Role
-function Role(type = "none"){
+function Role(type = "Role"){
     var role = Object.create(Role.prototype);
 
     role.type = type;
 
-    role.actionLog = [];
+    role.log = [];
 
     return role;
 }
 
 Role.prototype = {
-    team     : common.type.NONE,
-    isWolf   : false,
+    team    : common.type.NONE,
+    species : common.type.NONE,
 
     chatType  : common.chatType.PERSONAL,
     chatGroup : "none",
@@ -26,7 +26,16 @@ Role.prototype = {
     fromSeer   : common.type.NONE,
     fromMedium : common.type.NONE,
 
-    candidateCondition: ()=>{ return {}; },
+    // actionCandidates is a function:(village, baseCond) => candidates. null if not necessary
+    actionCandidates: null,
+    // actionResult returns result for definite action. null if not necessary
+    actionResult: null,
+
+    // evalActionNight returns result of action and/or stack it to fire event
+    evalActionNight: (village, userId, act) => { return {}; },
+
+    // mountEvent mounts event functions
+    mountEvent: function(village){},
 };
 
 /* memo

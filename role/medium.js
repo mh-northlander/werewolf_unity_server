@@ -7,21 +7,35 @@ Role = require('./role');
 
 
 // medium
-Medium.Name = "medium";
+Medium.Name = "Medium";
 
 function Medium(){
-    var vil = Object.create(Medium.prototype);
+    var medium = Object.create(Medium.prototype);
     Object.assign(vil, Role(Medium.Name))
 
-    return vil;
+    return medium;
 }
 
 Medium.prototype = {
     team   : common.type.HUMAN,
-    isWolf : false,
+    species : common.type.HUMAN,
 
     fromSeer   : common.type.HUMAN,
     fromMedium : common.type.HUMAN,
+
+    actionResult: function(village){
+        if(village.phase.dayCount <= 0){ return {}; }
+
+        return {}; // TODO: vote log
+
+        targetId  = village.log[village.phase.dayCount].execution.executedId;
+        target    = village.users[targetId];
+        mediumRes = target.role.fromMedium;
+        return {
+            userName : target.name,
+            result   : mediumRes==common.type.WEREWOLF ? mediumRes : common.type.HUMAN,
+        };
+    },
 }
 
 // isMedium
