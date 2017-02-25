@@ -9,7 +9,7 @@ module.exports = {
 
 // imports
 night = require("./night")
-role = require("./role")
+role = require("../role")
 
 // join room
 function joinRoom(io, socket, village){
@@ -62,12 +62,17 @@ function startGame(io, village){
             var userSocketId = village.users[userId].socketId;
             var userRole = village.users[userId].role;
             io.to(userSocketId).emit('roleAck', userRole.type);
-            console.log();
-            io.sockets.sockets[userSocketId].join(userId);
+            if(userRole.chatType == role.common.chatType.PERSONAL){
+                io.sockets.sockets[userSocketId].join(userId);
+                io.to(userId).emit("debug", userId + "はぼっち村の人です");
+            } else {
+                io.sockets.sockets[userSocketId].join(userRole.chatGroup);
+                io.to(userRole.chatGroup).emit("debug", "あなたは" + userRole + "です");
+            }
         }
 
         // set chat room : TODO
-        io.to("jinro").emit("debug", "デバッグだよ")
+
         // next phase
         night.Begin(io, village);
     }
