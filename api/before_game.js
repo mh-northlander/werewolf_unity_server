@@ -71,8 +71,6 @@ function startGame(io, village){
             }
         }
 
-        // set chat room : TODO
-
         // next phase
         night.Begin(io, village);
     }
