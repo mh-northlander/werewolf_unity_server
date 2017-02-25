@@ -190,8 +190,6 @@ Village.prototype = {
     },
     addVote: function(subjectUserId, vote){
         // vote: { userName[] } // TODO : userName -> userId
-        console.log(vote);
-
         for(name of vote.userName){
             votedUserId = this.nameToUserId(vote.userName)
             if(!votedUserId){ return; }
@@ -211,9 +209,6 @@ Village.prototype = {
                 maxVotes = this.voteStack[userId]
             }
         }
-
-        console.log(executedId);
-        console.log(this.users[executedId]);
 
         deads = this.event_executed(executedId);
         idx = deads.indexOf(executedId);
@@ -265,7 +260,7 @@ Village.prototype = {
                 return userId;
             }
         }
-        console.log("There are no user has name: " + name + ".")
+        console.log("error: There are no user has name: " + name + ".")
     },
 };
 

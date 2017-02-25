@@ -28,7 +28,7 @@ function vote(io, socket, village){
 };
 
 // begin
-function begin(io, socket, village){
+function begin(io, village){
     console.log("afternoon b");
     // shift phase
     phase = village.shiftPhase(GamePhaseAfternoon);
@@ -46,7 +46,7 @@ function begin(io, socket, village){
 };
 
 // end
-function end(io, socket, village){
+function end(io, village){
     console.log("afternoon e");
-    evening.Begin(io, socket, village);
+    evening.Begin(io, village);
 };

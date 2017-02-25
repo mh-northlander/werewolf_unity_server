@@ -7,6 +7,6 @@ module.export = {
 
 
 //
-function begin(io, socket, village){
+function begin(io, village){
 
 }

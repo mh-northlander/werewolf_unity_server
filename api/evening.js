@@ -13,7 +13,7 @@ night = require('./night');
 
 //// emit
 // begin
-function begin(io, socket, village){
+function begin(io, village){
     console.log("evening b");
     // shift phase
     phase = village.shiftPhase(GamePhaseEvening);
@@ -29,7 +29,7 @@ function begin(io, socket, village){
 };
 
 // end
-function end(io, socket, village){
+function end(io, village){
     console.log("evening e");
-    night.Begin(io, socket, village);
+    night.Begin(io, village);
 };

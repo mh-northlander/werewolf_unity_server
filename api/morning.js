@@ -10,7 +10,7 @@ dayTime = require("./daytime");
 
 
 // begin
-function begin(io, socket, village){
+function begin(io,  village){
     console.log("morning b");
     // shift phase
     phase = village.shiftPhase(GamePhaseMorning);
@@ -26,7 +26,7 @@ function begin(io, socket, village){
 };
 
 // end
-function end(io, socket, village){
+function end(io, village){
     console.log("morning e");
-    dayTime.Begin(io, socket, village);
+    dayTime.Begin(io, village);
 };

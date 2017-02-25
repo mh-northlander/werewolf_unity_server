@@ -36,7 +36,7 @@ function chat(io, socket, village){
 
 //// emit
 // begin
-function begin(io, socket, village){
+function begin(io, village){
     console.log("night b");
     // shift
     phase = village.shiftPhase(GamePhaseNight);
@@ -66,13 +66,13 @@ function begin(io, socket, village){
     // timer
     console.log("start count: " + phase.secCount);
     setTimeout(() => {
-        end(io, socket, village);
+        end(io, village);
     }, phase.secCount*1000);
 };
 
 // end
-function end(io, socket, village){
+function end(io, village){
     console.log("night e");
     // TODO 未決定行動のランダム決定
-    morning.Begin(io, socket, village);
+    morning.Begin(io, village);
 };

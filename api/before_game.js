@@ -48,7 +48,7 @@ function changeRule(io, socket, village){
 };
 
 // start game
-function startGame(io, socket, village){
+function startGame(io, village){
     return function(){
         // set role : TODO
         for(var userId in village.users){
@@ -60,6 +60,6 @@ function startGame(io, socket, village){
         // set chat room : TODO
 
         // next phase
-        night.Begin(io, socket, village);
+        night.Begin(io, village);
     }
 };
