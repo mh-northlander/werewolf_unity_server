@@ -8,3 +8,5 @@ exports.Werewolf = require('./werewolf');
 exports.Seer     = require('./seer');
 exports.Medium   = require('./medium');
 exports.Guard    = require('./guard');
+exports.Madman   = require('./madman');
+exports.Fox      = require('./fox');
