@@ -15,7 +15,8 @@ evening = require('./evening');
 // vate
 function vote(io, socket, village){
     return function(vote){
-        // vote: { userName[] }
+        // vote: [userId]
+        console.log(vote)
         userId = village.socketIdToUserId(socket.id);
 
         if(!village.users[userId].readyToShift){

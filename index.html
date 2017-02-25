@@ -1,99 +1,110 @@
 <!DOCTYPE html>
 <html lang="ja">
-  <head>
-    <meta charset="utf-8">
-    <title>websocket-chat</title>
-    <link rel="stylesheet"
-          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script type="text/javascript"
-            src="/socket.io/socket.io.js"></script>
-  </head>
+    <head>
+        <meta charset="utf-8">
+        <title>websocket-chat</title>
+        <link rel="stylesheet"
+              href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <script type="text/javascript"
+                src="/socket.io/socket.io.js"></script>
+    </head>
 
-  <body>
-    <div class="container">
-      <h1>WebSocket-Chat</h1>
-      <form class="form-inline">
-        <div class="form-group">
-          <label for="msgForm"> message: </label>
-          <input type="text" class="form-control" id="msgForm">
+    <body>
+        <div class="container">
+            <h1>WebSocket-Chat</h1>
+            <form class="form-inline">
+                <div class="form-group">
+                    <label for="msgForm"> message: </label>
+                    <input type="text" class="form-control" id="msgForm">
+                </div>
+                <button type="submit" class="btn btn-primary" id="join">join room</button>
+                <button type="button" class="btn btn-primary" id="exit">exit room</button>
+                <button type="button" class="btn btn-primary" id="gameStart">gameStart</button>
+            </form>
+            <form class="form-inline">
+                <button type="button" class="btn btn-primary" id="ready">readyToShift</button>
+                <button type="button" class="btn btn-primary" id="vote">vote</button>
+            </form>
+            <div id="chatLogs"></div>
         </div>
-        <button type="submit" class="btn btn-primary" id="join">join room</button>
-        <button type="button" class="btn btn-primary" id="exit">exit room</button>
-        <button type="button" class="btn btn-primary" id="gameStart">gameStart</button>
-      </form>
-      <form class="form-inline">
-        <button type="button" class="btn btn-primary" id="ready">readyToShift</button>
-        <button type="button" class="btn btn-primary" id="vote">vote</button>
-      </form>
-      <div id="chatLogs"></div>
-    </div>
 
-    <script type="text/javascript">
-      function appendMsg(text) {
-        $("#chatLogs").append("<div>" + text + "</div>");
-      }
+        <script type="text/javascript">
+         function appendMsg(text) {
+             $("#chatLogs").append("<div>" + text + "</div>");
+         }
 
-      function randomString(length) {
-        return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
-      };
-      var userId = randomString(8)
-      var socket = io.connect();
+         function randomString(length) {
+             return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
+         };
+         var userId = randomString(8)
+         var socket = io.connect();
 
-      socket.on("connectionEstablished", function(){
-        appendMsg("connect!");
-      });
-      $("form").submit(function(e){
-        var message = $("#msgForm").val();
-        $("#msgForm").val("");
-        if(message != ""){
-          socket.emit("joinRoom", {userId : userId, name: message});
-          e.preventDefault();
-        }
-      });
-      $("#exit").click(function(e){
-        socket.emit("exitRoom");
-      });
-      socket.on("memberChanged", function(list){
-        appendMsg(list);
-      });
-      $("#gameStart").click(function(e){
-        socket.emit("startGame");
-      });
+         socket.on("connectionEstablished", function(){
+             appendMsg("connect!");
+         });
+         $("form").submit(function(e){
+             var message = $("#msgForm").val();
+             $("#msgForm").val("");
+             if(message != ""){
+                 socket.emit("joinRoom", {userId : userId, name: message});
+                 e.preventDefault();
+             }
+         });
+         $("#exit").click(function(e){
+             socket.emit("exitRoom");
+         });
 
-      socket.on("phaseChange", function(data){
-        appendMsg(data.phase + " of day " + data.dayCount + ", sec:" + data.timeCount);
-      });
-      socket.on("roleAck", function(roleName){
-        appendMsg("role: " + roleName);
-      });
-      $("#ready").click(function(e){
-        socket.emit("readyToShift");
-      });
+         idToNameMap = {};
+         nameToIdMap = {};
+         socket.on("memberChanged", function(pairs){ // pairs:[{id, name}]
+             idToNameMap = pairs.reduce((ret,p)=>{
+                 ret[p.id] = p.name;
+                 return ret;
+             },{});
+             nameToIdMap = pairs.reduce((ret,p)=>{
+                 ret[p.name] = p.id;
+                 return ret;
+             },{});
 
-      voteCandidates = [];
-      socket.on("voteCandidates", function(list){
-        voteCandidates = list
-        for(v of list){
-          appendMsg(v.userName);
-        }
-      })
-      $("#vote").click(function(e){
-        var vote = [$("#msgForm").val()];
-        $("#msgForm").val("");
-        socket.emit("vote", { userName: vote });
-      });
+             appendMsg(pairs.reduce((ret,p)=>{ret.push(p.name); return ret;},[]));
+         });
+         $("#gameStart").click(function(e){
+             socket.emit("startGame");
+         });
 
-      socket.on("voteResult", function(result){
-        console.log(result);
-        appendMsg("We excute " + result.executedName + ", and We hope the village become peace");
-      })
+         socket.on("phaseChange", function(data){
+             appendMsg(data.phase + " of day " + data.dayCount + ", sec:" + data.timeCount);
+         });
+         socket.on("roleAck", function(roleName){
+             appendMsg("role: " + roleName);
+         });
+         $("#ready").click(function(e){
+             socket.emit("readyToShift");
+         });
+         socket.on("debug", function(debug){
+             console.log(debug);
+             appendMsg(debug);
+         })
+         voteCandidateIds = [];
+         socket.on("voteCandidates", function(ids){
+             voteCandidates = ids
+             appendMsg(ids.reduce((r,id)=>{r.push(idToNameMap[id]); return r;},[]));
+         })
+         $("#vote").click(function(e){
+             var vote = [$("#msgForm").val()];
+             $("#msgForm").val("");
+             id = nameToIdMap[vote]
+             if(id){
+                 socket.emit("vote", [id]);
+             }
+         });
 
-      socket.on("debug", function(debug){
-        console.log(debug);
-        appendMsg(debug);
-      })
+         socket.on("voteResult", function(result){
+             console.log(result);
+             appendMsg("We excute " + idToNameMap[result.executedId] + ", and We hope the village become peace");
+         })
 
-    </script>
-  </body>
+        </script>
+    </body>
 </html>

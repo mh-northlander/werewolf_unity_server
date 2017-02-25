@@ -17,7 +17,7 @@ function Medium(){
 }
 
 Medium.prototype = {
-    team   : common.type.HUMAN,
+    team    : common.type.HUMAN,
     species : common.type.HUMAN,
 
     fromSeer   : common.type.HUMAN,
@@ -28,11 +28,10 @@ Medium.prototype = {
 
         return {}; // TODO: vote log
 
-        targetId  = village.log[village.phase.dayCount].execution.executedId;
-        target    = village.users[targetId];
-        mediumRes = target.role.fromMedium;
+        objectId  = village.log[village.phase.dayCount].execution.executedId;
+        mediumRes = village.users[objectId].role.fromMedium;
         return {
-            userName : target.name,
+            objectId : objectId,
             result   : mediumRes==common.type.WEREWOLF ? mediumRes : common.type.HUMAN,
         };
     },

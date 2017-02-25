@@ -40,14 +40,13 @@ Seer.prototype = {
 
         if(!village.actionStack["see"]){ village.actionStack["see"] = []; }
         village.actionStack["see"].push({
-            subjectUserId : userId,
-            objectUserId  : act.userId,
+            subjectId : userId,
+            objectId  : act.userId,
         });
 
-        target  = village.users[act.userId];
-        seerRes = target.role.fromSeer;
+        seerRes = village.users[act.userId].role.fromSeer;
         return {
-            userName : target.name,
+            objectId : act.userId,
             result   : seerRes==common.type.WEREWOLF ? seerRes : commontype.HUMAN,
         }
     }

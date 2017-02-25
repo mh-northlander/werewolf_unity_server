@@ -40,13 +40,13 @@ Werewolf.prototype = {
         village.actionStack["bite"].push({
             subjectId : userId,
             objectId  : act.userId,
-            power         : act.power,
+            power     : act.power,
         });
 
         return {
-            wolfName : village.users[userId].name,
-            userName : village.users[act.userId].name,
-            power    : act.power,
+            subjectId : userId,
+            objectId  : act.userId,
+            power     : act.power,
         };
     }
 }

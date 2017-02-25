@@ -26,7 +26,7 @@ Role.prototype = {
     fromSeer   : common.type.NONE,
     fromMedium : common.type.NONE,
 
-    // actionCandidates is a function:(village, baseCond) => candidates. null if not necessary
+    // actionCandidates is a function:(village, subjectId) => [userId]. null if not necessary
     actionCandidates: null,
     // actionResult returns result for definite action. null if not necessary
     actionResult: null,

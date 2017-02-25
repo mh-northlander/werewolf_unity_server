@@ -16,11 +16,14 @@ function joinRoom(io, socket, village){
     return function(data){
         village.addUser(data.userId, socket.id, data.name);
 
-        // user name list
+        // list of {id,name}
         io.sockets.emit("memberChanged",
-                        Object.keys(village.users).reduce((ret,key)=>{
-                            ret.push(village.users[key].name);
-                            return ret
+                        Object.keys(village.users).reduce((ret,id)=>{
+                            ret.push({
+                                id   : id,
+                                name : village.users[id].name,
+                            });
+                            return ret;
                         }, []));
     }
 };
@@ -31,11 +34,14 @@ function exitRoom(io, socket, village){
         userId = village.socketIdToUserId(socket.id)
         village.removeUser(userId);
 
-        // user name list
+        // list of {id,name}
         io.sockets.emit("memberChanged",
-                        Object.keys(village.users).reduce((ret,key)=>{
-                            ret.push(village.users[key].name);
-                            return ret
+                        Object.keys(village.users).reduce((ret,id)=>{
+                            ret.push({
+                                id   : id,
+                                name : village.users[id].name,
+                            });
+                            return ret;
                         }, []));
     }
 };
