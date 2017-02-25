@@ -77,7 +77,9 @@
         }
       })
       $("#vote").click(function(e){
-        socket.emit("vote", {});
+        var vote = [$("#msgForm").val()];
+        $("#msgForm").val("");
+        socket.emit("vote", {vote});
       });
 
     </script>

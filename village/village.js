@@ -20,6 +20,7 @@ function Village(villageId){
     village.phase = Phase();
     village.actionStack = [];
     village.log = [Log()];
+    village.votedStack = {};
 
     return village;
 }
@@ -123,7 +124,14 @@ Village.prototype = {
         })
     },
     addVote: function(subjectUserId, vote){
-
+      // vote: {userId:[]}
+      votedName = vote.vote[0] //TODO:vote is Name list
+      votedUserId = this.nameToUserId(votedName)
+      if(votedUserId && (votedUserId in this.votedStack)){
+        this.votedStack[votedUserId] = this.votedStack[votedUserId] + 1;
+      } else if (votedUserId) {
+        this.votedStack[votedUserId] = 1;
+      }
     },
     evalVote: function(){
         return {};
@@ -152,6 +160,17 @@ Village.prototype = {
             return ret;
         }, []);
     },
+
+    nameToUserId: function(name){
+      isDetected = false;
+      for(key in this.users){
+        if(name == this.users[key].name){
+          isDetected = true;
+          return this.users[key].id;
+        }
+      }
+      if(isDetected == false){console.log("There are no user has name: " + name);}
+    }
 };
 
 Village.isVillage = (obj,type)=>{
