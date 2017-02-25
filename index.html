@@ -71,7 +71,9 @@
         socket.emit("readyToShift");
       });
 
+      voteCandidates = [];
       socket.on("voteCandidates", function(list){
+        voteCandidates = list
         for(v of list){
           appendMsg(v.userName);
         }
@@ -79,12 +81,12 @@
       $("#vote").click(function(e){
         var vote = [$("#msgForm").val()];
         $("#msgForm").val("");
-        socket.emit("vote", {vote});
+        socket.emit("vote", { userName: vote });
       });
 
       socket.on("voteResult", function(result){
         console.log(result);
-        appendMsg("We excute " + result.userName + ", and We hope the village become peace");
+        appendMsg("We excute " + result.executedName + ", and We hope the village become peace");
       })
 
     </script>

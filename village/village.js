@@ -20,7 +20,7 @@ function Village(villageId){
 
     village.phase = Phase();
     village.log = [Log()];
-    village.votedStack = {};
+    village.voteStack = {};
 
     village.actionStack = {};
 
@@ -56,16 +56,6 @@ Village.prototype = {
     },
     removeUser: function(userId){
         delete this.users[userId];
-    },
-    socketIdToUserId: function(socketId){
-        for(key in this.users){
-            if(this.users[key].socketId == socketId){
-                return key;
-            }
-        }
-    },
-    userIdToSocketId: function(userId){
-        return this.users[userId].socketId;
     },
 
     // rule
@@ -126,7 +116,7 @@ Village.prototype = {
         // see
         if(this.actionStack["see"]){
             for(e of this.actionStack["see"]){
-                deads = deads.concat(this.event.saw(e.subjectUserId, e.objectUserId));
+                deads = deads.concat(this.event_saw(e.subjectUserId, e.objectUserId));
             }
         }
 
@@ -164,31 +154,32 @@ Village.prototype = {
             // random choice if tie
             objectId   = objectIds[Math.floor(Math.random() * objectIds.length)];
             subjectIds = summary[objectId];
-            deads = deads.concat(this.event.bited(
+            deads = deads.concat(this.event_bited(
                 subjectIds[Math.floor(Math.random() * subjectIds.length)], objectId));
         }
+
         //
         return {
-            deads: deads,
+            deadIds: deads,
         };
     },
 
     // event
-    event : { // event funcs return dead list [userId]
-        saw: function(subjectUserId, objectUserId, base=[]){
-            return base;
-        },
-        bited: function(subjectUserId, objectUserId, base=[]){
-            return this.event.died(objectUserId, base);
-        },
-        executed: function(objectUserId, base=[]){
-            return this.event.died(objectUserId, base);
-        },
-        died: function(objectUserId, base=[]){
-            this.users[objectUserId].alive = false;
-            return base.concat([objectUserId]);
-        },
+    //event : { // event funcs return dead list [userId]
+    event_saw: function(subjectId, objectId, base=[]){
+        return base;
     },
+    event_bited: function(subjectId, objectId, base=[]){
+        return this.event_died(objectId, base);
+    },
+    event_executed: function(objectId, base=[]){
+        return this.event_died(objectId, base);
+    },
+    event_died: function(objectId, base=[]){
+        this.users[objectId].alive = false;
+        return base.concat([objectId]);
+    },
+    //},
 
     // vote
     voteCandidates: function(subjectUserId){
@@ -198,29 +189,40 @@ Village.prototype = {
         })
     },
     addVote: function(subjectUserId, vote){
-      // vote: {userId:[]}
-      votedName = vote.vote[0] //TODO:vote is Name list
-      votedUserId = this.nameToUserId(votedName)
+        // vote: { userName[] } // TODO : userName -> userId
+        console.log(vote);
 
-      if(votedUserId && (votedUserId in this.votedStack)){
-        this.votedStack[votedUserId] = this.votedStack[votedUserId] + 1;
-      } else if (votedUserId) {
-        this.votedStack[votedUserId] = 1;
-      }
+        for(name of vote.userName){
+            votedUserId = this.nameToUserId(vote.userName)
+            if(!votedUserId){ return; }
+
+            if(!this.voteStack[votedUserId]){
+                this.voteStack[votedUserId] = 0;
+            }
+            this.voteStack[votedUserId] += 1;
+        }
     },
     evalVote: function(){
-      maxVotes = 0;
-      for(userId in this.votedStack){
-        if(this.votedStack[userId] > maxVotes){
-          candidateUserId = userId,
-          maxVotes = this.votedStack[userId]
+        maxVotes = 0;
+        executedId = null;
+        for(userId in this.voteStack){
+            if(this.voteStack[userId] > maxVotes){
+                executedId = userId,
+                maxVotes = this.voteStack[userId]
+            }
         }
-      }
-      this.killSomeone(userId);
-      return {
-        userName: this.users[candidateUserId].name,
-        userId: candidateUserId
-      };
+
+        console.log(executedId);
+        console.log(this.users[executedId]);
+
+        deads = this.event_executed(executedId);
+        idx = deads.indexOf(executedId);
+        deads = deads.splice(idx, 1);
+        return {
+            executedId   : executedId,
+            executedName : this.users[executedId].name,
+            deadIds      : deads,
+        };
     },
 
     // util
@@ -246,19 +248,25 @@ Village.prototype = {
             return ret;
         }, []);
     },
-    nameToUserId: function(name){
-      isDetected = false;
-      for(key in this.users){
-        if(name == this.users[key].name){
-          isDetected = true;
-          return this.users[key].id;
+
+    socketIdToUserId: function(socketId){
+        for(key in this.users){
+            if(this.users[key].socketId == socketId){
+                return key;
+            }
         }
-      }
-      if(isDetected == false){console.log("There are no user has name: " + name);}
     },
-    killSomeone: function(userId){
-      this.users[userId].alive = false
-    }
+    userIdToSocketId: function(userId){
+        return this.users[userId].socketId;
+    },
+    nameToUserId: function(name){
+        for(userId in this.users){
+            if(name == this.users[userId].name){
+                return userId;
+            }
+        }
+        console.log("There are no user has name: " + name + ".")
+    },
 };
 
 Village.isVillage = (obj,type)=>{

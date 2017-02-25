@@ -15,9 +15,12 @@ evening = require('./evening');
 // vate
 function vote(io, socket, village){
     return function(vote){
-        // vote: {userId:[]}
+        // vote: { userName[] }
         userId = village.socketIdToUserId(socket.id);
-        village.addVote(userId, vote);
+
+        if(!village.users[userId].readyToShift){
+            village.addVote(userId, vote);
+        }
 
         // check
         shared.ReadyToShift(io,socket,village)();
