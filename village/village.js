@@ -127,6 +127,7 @@ Village.prototype = {
       // vote: {userId:[]}
       votedName = vote.vote[0] //TODO:vote is Name list
       votedUserId = this.nameToUserId(votedName)
+
       if(votedUserId && (votedUserId in this.votedStack)){
         this.votedStack[votedUserId] = this.votedStack[votedUserId] + 1;
       } else if (votedUserId) {
@@ -134,7 +135,18 @@ Village.prototype = {
       }
     },
     evalVote: function(){
-        return {};
+      maxVotes = 0;
+      for(userId in this.votedStack){
+        if(this.votedStack[userId] > maxVotes){
+          candidateUserId = userId,
+          maxVotes = this.votedStack[userId]
+        }
+      }
+      this.killSomeone(userId);
+      return {
+        userName: this.users[candidateUserId].name,
+        userId: candidateUserId
+      };
     },
 
     // util
@@ -160,7 +172,6 @@ Village.prototype = {
             return ret;
         }, []);
     },
-
     nameToUserId: function(name){
       isDetected = false;
       for(key in this.users){
@@ -170,6 +181,9 @@ Village.prototype = {
         }
       }
       if(isDetected == false){console.log("There are no user has name: " + name);}
+    },
+    killSomeone: function(userId){
+      this.users[userId].alive = false
     }
 };
 

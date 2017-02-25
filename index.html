@@ -82,6 +82,11 @@
         socket.emit("vote", {vote});
       });
 
+      socket.on("voteResult", function(result){
+        console.log(result);
+        appendMsg("We excute " + result.userName + ", and We hope the village become peace");
+      })
+
     </script>
   </body>
 </html>
