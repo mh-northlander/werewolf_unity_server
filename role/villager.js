@@ -18,7 +18,6 @@ function Villager(){
 
 Villager.prototype = {
     team   : common.type.HUMAN,
-    isWolf : false,
 
     fromSeer   : common.type.HUMAN,
     fromMedium : common.type.HUMAN,

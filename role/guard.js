@@ -18,12 +18,31 @@ function Guard(){
 
 Guard.prototype = {
     team   : common.type.HUMAN,
-    isWolf : false,
 
     fromSeer   : common.type.HUMAN,
     fromMedium : common.type.HUMAN,
 
-    candidateCondition: ()=>{ return { alive: true }; },
+    actionCandidates: function(village, selfId){
+        exp = [selfId];
+        if(this.log.length > 0){
+            exp.push(this.log[this.log.length-1].userId)
+        }
+
+        return village.listMembersWithCondition({
+            alive  : true,
+            except : exp,
+        })
+    },
+
+    evalActionNight: function(village, userId, act){
+        // act: { type:"guard", userId }
+        // log
+        this.log.push({ userId: act.userId });
+
+        village.actionStack.push(act);
+
+        return {};
+    },
 }
 
 // isGuard

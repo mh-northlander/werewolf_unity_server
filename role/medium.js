@@ -18,10 +18,23 @@ function Medium(){
 
 Medium.prototype = {
     team   : common.type.HUMAN,
-    isWolf : false,
 
     fromSeer   : common.type.HUMAN,
     fromMedium : common.type.HUMAN,
+
+    actionResult: function(village){
+        if(village.phase.dayCount <= 0){ return {}; }
+
+        return {}; // TODO: vote log
+
+        targetId  = village.log[village.phase.dayCount].execution.executedId;
+        target    = village.users[targetId];
+        mediumRes = target.role.fromMedium;
+        return {
+            userName : target.name,
+            result   : mediumRes==common.type.WEREWOLF ? mediumRes : common.type.HUMAN,
+        };
+    },
 }
 
 // isMedium

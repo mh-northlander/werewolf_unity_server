@@ -7,6 +7,7 @@ User  = require('./user');
 Rule  = require('./rule');
 Log   = require('./log');
 
+role = require("../role/");
 
 // Village
 function Village(villageId){
@@ -94,23 +95,29 @@ Village.prototype = {
     },
 
     // action
-    listActionCandidates: function(userId){
-        cond = this.users[userId].role.candidateCondition();
-        if(cond.except){
-            cond.except.push(userId);
-        } else {
-            cond.except = [userId];
-        }
-
-        return this.listMembersWithCondition(cond)
+    getCandidatesMap: function(){
+        Object.keys(this.users).reduce((ret,userId)=>{
+            if(this.users[userId].alive && this.users[userId].role.actionCandidates){
+                list = this.users[userId].role.actionCandidates(this, userId);
+                if(!list == []){
+                    ret[userId] = list;
+                }
+            }
+            return ret;
+        }, {})
     },
-    addAction: function(subjectUserId, act){
-        // act: {type, userId (target), ~}
-
-        // resp: {subjectUser, objectUser, result:role.common, }
-        return {};
+    getResultMap: function(){
+        Object.keys(this.users).reduce((ret,userId)=>{
+            if(this.users[userId].alive && this.users[userId].role.actionResult){
+                res = this.users[userId].role.actionResult(this);
+                if(!res == {}){
+                    ret[userId] = res;
+                }
+            }
+            return ret;
+        }, {})
     },
-    evalAction: function(){
+    evalActionMorning: function(){
         // resp: {deads:[userName], }
         return {};
     },
@@ -143,7 +150,7 @@ Village.prototype = {
             if(cond.alive  && !user.alive){ return ret; }
             if(cond.except && (userId in cond.except)){ return ret; }
 
-            if(cond.notWold && user.role.isWolf){ return ret; }
+            if(cond.notWold && user.role.species==role.common.type.WEREWOLF){ return ret; }
 
             ret.push({
                 userName: user.name,

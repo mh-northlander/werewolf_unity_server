@@ -17,8 +17,8 @@ function Werewolf(){
 }
 
 Werewolf.prototype = {
-    team     : common.type.WEREWOLF,
-    isWolf   : true,
+    team    : common.type.WEREWOLF,
+    species : common.type.WEREWOLF,
 
     chatType  : common.chatType.GROUP,
     chatGroup : "werewolf",
@@ -26,12 +26,24 @@ Werewolf.prototype = {
     fromSeer   : common.type.WEREWOLF,
     fromMedium : common.type.WEREWOLF,
 
-    candidateCondition: ()=>{
-        return {
-            alive: true,
-            notWolf: true,
-        };
+    actionCandidates: function(village, selfId){
+        return village.listMembersWithCondition({
+            alive   : true,
+            notWolf : true,
+            except  : [selfId],
+        })
     },
+
+    evalActionNight: function(village, userId, act){
+        // act: { type:"bite", userId, power }
+        village.actionStack.push(act);
+
+        return {
+            wolfName : village.users[userId].name,
+            userName : village.users[act.userId].name,
+            power    : act.power,
+        };
+    }
 }
 
 // isWerewolf

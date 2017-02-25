@@ -18,20 +18,32 @@ function Seer(){
 
 Seer.prototype = {
     team   : common.type.HUMAN,
-    isWolf : false,
 
     fromSeer   : common.type.HUMAN,
     fromMedium : common.type.HUMAN,
 
-    candidateCondition: ()=>{
-        return {
-            alive: true,
-            except: this.actionLog.reduce((ret,val)=>{
+    actionCandidates: function(village, selfId){
+        return village.listMembersWithCondition({
+            alive  : true,
+            except : this.log.reduce((ret,val)=>{
                 ret.push(val.userId);
-                return ret;
-            }, []),
-        };
+                return ret
+            }, [selfId])
+        });
     },
+
+    evalActionNight: function(village, userId, act){
+        // act: { type:"see", userId }
+        // log
+        this.log.push({ userId: act.userId });
+
+        target  = village.users[act.userId];
+        seerRes = target.role.fromSeer;
+        return {
+            userName : target.name,
+            result   : seerRes==common.type.WEREWOLF ? seerRes : commontype.HUMAN,
+        }
+    }
 }
 
 // isSeer
