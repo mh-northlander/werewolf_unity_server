@@ -89,6 +89,11 @@
         appendMsg("We excute " + result.executedName + ", and We hope the village become peace");
       })
 
+      socket.on("debug", function(debug){
+        console.log(debug);
+        appendMsg(debug);
+      })
+
     </script>
   </body>
 </html>
