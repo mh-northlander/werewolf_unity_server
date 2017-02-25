@@ -7,17 +7,18 @@ Role = require('./role');
 
 
 // seer
-Seer.Name = "seer";
+Seer.Name = "Seer";
 
 function Seer(){
-    var vil = Object.create(Seer.prototype);
+    var seer = Object.create(Seer.prototype);
     Object.assign(vil, Role(Seer.Name))
 
-    return vil;
+    return seer;
 }
 
 Seer.prototype = {
     team   : common.type.HUMAN,
+    species : common.type.HUMAN,
 
     fromSeer   : common.type.HUMAN,
     fromMedium : common.type.HUMAN,
@@ -36,6 +37,12 @@ Seer.prototype = {
         // act: { type:"see", userId }
         // log
         this.log.push({ userId: act.userId });
+
+        if(!village.actionStack["see"]){ village.actionStack["see"] = []; }
+        village.actionStack["see"].push({
+            subjectUserId : userId,
+            objectUserId  : act.userId,
+        });
 
         target  = village.users[act.userId];
         seerRes = target.role.fromSeer;

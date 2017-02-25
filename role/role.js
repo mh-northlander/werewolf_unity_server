@@ -18,7 +18,7 @@ function Role(type = "Role"){
 
 Role.prototype = {
     team    : common.type.NONE,
-    species : common.type.HUMAN,
+    species : common.type.NONE,
 
     chatType  : common.chatType.PERSONAL,
     chatGroup : "none",
@@ -31,10 +31,11 @@ Role.prototype = {
     // actionResult returns result for definite action. null if not necessary
     actionResult: null,
 
-    // evalActionNight returns result of action and/or just stack it
+    // evalActionNight returns result of action and/or stack it to fire event
     evalActionNight: (village, userId, act) => { return {}; },
-    // evalActionMorning evals action
-    evalActionMorning: village => { return {}; },
+
+    // mountEvent mounts event functions
+    mountEvent: function(village){},
 };
 
 /* memo

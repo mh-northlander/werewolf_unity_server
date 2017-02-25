@@ -7,7 +7,7 @@ Role = require('./role');
 
 
 // villager
-Villager.Name = "villager";
+Villager.Name = "Villager";
 
 function Villager(){
     var vil = Object.create(Villager.prototype);
@@ -18,6 +18,7 @@ function Villager(){
 
 Villager.prototype = {
     team   : common.type.HUMAN,
+    species : common.type.HUMAN,
 
     fromSeer   : common.type.HUMAN,
     fromMedium : common.type.HUMAN,

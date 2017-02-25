@@ -7,13 +7,13 @@ Role = require('./role');
 
 
 // werewolf
-Werewolf.Name = "werewolf";
+Werewolf.Name = "Werewolf";
 
 function Werewolf(){
-    var vil = Object.create(Werewolf.prototype);
+    var wolf = Object.create(Werewolf.prototype);
     Object.assign(vil, Role(Werewolf.Name))
 
-    return vil;
+    return wolf;
 }
 
 Werewolf.prototype = {
@@ -36,7 +36,12 @@ Werewolf.prototype = {
 
     evalActionNight: function(village, userId, act){
         // act: { type:"bite", userId, power }
-        village.actionStack.push(act);
+        if(!village.actionStack["bite"]){ village.actionStack["bite"] = []; }
+        village.actionStack["bite"].push({
+            subjectId : userId,
+            objectId  : act.userId,
+            power         : act.power,
+        });
 
         return {
             wolfName : village.users[userId].name,

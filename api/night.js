@@ -46,6 +46,9 @@ function begin(io, socket, village){
         timeCount: phase.secCount,
     });
 
+    // reset
+    village.actionStack = {};
+
     // action candidates
     candidatesMap = village.getCandidatesMap()
     for(userId in candidatesMap){

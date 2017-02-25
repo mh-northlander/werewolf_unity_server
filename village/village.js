@@ -19,8 +19,9 @@ function Village(villageId){
     village.rule = Rule();
 
     village.phase = Phase();
-    village.actionStack = [];
     village.log = [Log()];
+
+    village.actionStack = {};
 
     return village;
 }
@@ -118,8 +119,74 @@ Village.prototype = {
         }, {})
     },
     evalActionMorning: function(){
-        // resp: {deads:[userName], }
-        return {};
+        if(this.phase.dayCount == 1){ return { deads:[] }; }
+
+        deads = [];
+        // see
+        if(this.actionStack["see"]){
+            for(e of this.actionStack["see"]){
+                deads = deads.concat(this.event.saw(e.subjectUserId, e.objectUserId));
+            }
+        }
+
+        //// bite
+        if(this.actionStack["bite"]){
+            // summarize all bite action
+            summary = {} // objectId -> { powerSum, subjectIds, subjectPower }
+            for(e of this.actionStack["bite"]){
+                if(summary[e.objectId]){ // init
+                    summary[e.objectId] = {
+                        powerSum     : 0,
+                        subjectPower : 0,
+                        subjectIds   : [],
+                    };
+                }
+                summary[e.objectId].powerSum += e.power
+                if       (e.power >  summary[e.objectId].subjectPower){
+                    summary[e.objectId].subjectIds   = [e.subjectId];
+                    summary[e.objectId].subjectPower = e.power;
+                } else if(e.power == summary[e.objectId].subjectPower){
+                    summary[e.objectId].subjectIds.push(e.subjectId);
+                }
+            }
+            // search victim
+            objectIds = [];
+            maxPower = 0;
+            for(objectId in summary){
+                if       (summary[objectId].powerSum >  maxPower){
+                    objectIds = [objectId];
+                    maxPower  = summary[objectId].powerSum;
+                } else if(summary[objectId].powerSum == maxPower){
+                    objectIds.push(objectId);
+                }
+            }
+            // random choice if tie
+            objectId   = objectIds[Math.floor(Math.random() * objectIds.length)];
+            subjectIds = summary[objectId];
+            deads = deads.concat(this.event.bited(
+                subjectIds[Math.floor(Math.random() * subjectIds.length)], objectId));
+        }
+        //
+        return {
+            deads: deads,
+        };
+    },
+
+    // event
+    event : { // event funcs return dead list [userId]
+        saw: function(subjectUserId, objectUserId, base=[]){
+            return base;
+        },
+        bited: function(subjectUserId, objectUserId, base=[]){
+            return this.event.died(objectUserId, base);
+        },
+        executed: function(objectUserId, base=[]){
+            return this.event.died(objectUserId, base);
+        },
+        died: function(objectUserId, base=[]){
+            this.users[objectUserId].alive = false;
+            return base.concat([objectUserId]);
+        },
     },
 
     // vote

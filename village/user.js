@@ -16,6 +16,7 @@ function User(userId, userName, socketId){
 
     user.alive = true;
     user.readyToShift = false;
+    user.guarded = false;
 
     user.role = role.Role(); // null role
     user.chatRoom = userId;

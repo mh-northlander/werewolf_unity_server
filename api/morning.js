@@ -21,8 +21,8 @@ function begin(io, socket, village){
     });
 
     // morning result
-    result = village.evalAction();
-    io.sockets.emit("actionResult", result);
+    results = village.evalActionMorning();
+    io.sockets.emit("actionResult", results);
 };
 
 // end
