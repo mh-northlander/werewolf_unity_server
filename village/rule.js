@@ -8,10 +8,10 @@ module.exports = Rule
 function Rule(){
     var rule = Object.create(Rule.prototype);
 
-    rule.dayTime = 5;
+    rule.dayTime = 1;
     rule.dayTimeDecreasesBy = 1;
 
-    rule.nightTime = 5;
+    rule.nightTime = 1;
 
     rule.firstNightSee = Rule.firstNightSee.Given;
     rule.roleLackable = false;

@@ -141,7 +141,7 @@ Village.prototype = {
             user = this.users[userId];
 
             if(cond.alive  && !user.alive){ return ret; }
-            if(cond.except && (userId in cond.except)){ return ret; }
+            if(cond.except && cond.except.indexOf(userId) >= 0 ){ return ret; }
 
             if(cond.notWold && user.role.isWolf){ return ret; }
 

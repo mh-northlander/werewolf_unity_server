@@ -72,7 +72,7 @@
       });
 
       socket.on("voteCandidates", function(list){
-        for(v in list){
+        for(v of list){
           appendMsg(v.userName);
         }
       })
