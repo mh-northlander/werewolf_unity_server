@@ -82,7 +82,10 @@
          $("#ready").click(function(e){
              socket.emit("readyToShift");
          });
-
+         socket.on("debug", function(debug){
+             console.log(debug);
+             appendMsg(debug);
+         })
          voteCandidateIds = [];
          socket.on("voteCandidates", function(ids){
              voteCandidates = ids
