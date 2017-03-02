@@ -1,10 +1,12 @@
 // exports
 module.exports = {
-    JoinRoom:  joinRoom,
-    ExitRoom:  exitRoom,
-    ChangeRule:changeRule,
+    JoinRoom : joinRoom,
+    ExitRoom : exitRoom,
 
-    StartGame: startGame,
+    ChangeRule    : changeRule,
+    ChangeRoleSet : changeRoleSet,
+
+    StartGame : startGame,
 };
 
 // imports
@@ -34,8 +36,15 @@ function exitRoom(io, socket, village){
 // change rule
 function changeRule(io, socket, village){
     return function(rule){
-        village.changeRule(rule);
-        io.sockets.emit('ruleChanged', village.Rule);
+        village.updateRule(rule);
+        io.sockets.emit('ruleChanged', village.Rule.toJSON());
+    }
+};
+
+function changeRoleSet(io, socket, village){
+    return function(roleObj){
+        village.updateRoleSet(roleObj)
+        io.sockets.emit("ruleChanged", village.Rule.toJSON());
     }
 };
 

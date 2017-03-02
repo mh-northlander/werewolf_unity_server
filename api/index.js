@@ -42,10 +42,13 @@ module.exports.mountAPIs = function(io){
         socket.on('readyToShift', shared.ReadyToShift(io,socket, vil))
 
         // before game
-        socket.on('joinRoom',   before_game.JoinRoom(io,socket, vil));
-        socket.on('exitRoom',   before_game.ExitRoom(io,socket, vil));
-        socket.on('changeRule', before_game.ChangeRule(io,socket, vil));
-        socket.on('startGame',  before_game.StartGame(io, vil));
+        socket.on('joinRoom', before_game.JoinRoom(io,socket, vil));
+        socket.on('exitRoom', before_game.ExitRoom(io,socket, vil));
+
+        socket.on('changeRule',    before_game.ChangeRule(io,socket, vil));
+        socket.on('changeRoleSet', before_game.ChangeRoleSet(io,socket, vil));
+
+        socket.on('startGame', before_game.StartGame(io, vil));
 
         // afternoon
         socket.on('vote', afternoon.Vote(io,socket, vil))
