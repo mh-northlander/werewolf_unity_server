@@ -62,8 +62,8 @@ Village.prototype = {
     updateBaseRule: function(obj){
         this.rule.updateBase(obj);
     },
-    updateRoleSet: function(obj){
-        this.rule.updateRoleSet(this.rule.JSONToRoleSet(obj));
+    updateRoleSet: function(map){
+        this.rule.updateRoleSet(map);
     },
 
     // phase

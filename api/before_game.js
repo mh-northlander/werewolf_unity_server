@@ -10,7 +10,8 @@ module.exports = {
 };
 
 // imports
-night = require("./night")
+rule = require("../village/rule");
+night = require("./night");
 
 // join room
 function joinRoom(io, socket, village){
@@ -43,7 +44,7 @@ function changeRule(io, socket, village){
 
 function changeRoleSet(io, socket, village){
     return function(roleObj){
-        village.updateRoleSet(roleObj)
+        village.updateRoleSet(rule.JSONToRoleMap(roleObj));
         io.sockets.emit("ruleChanged", village.Rule.toJSON());
     }
 };

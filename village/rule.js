@@ -21,9 +21,9 @@ function Rule(){
     rule.roleLackable = false;
 
     // number of members. minimum 4
-    member = 4;
+    rule.member = 4;
     // set of role in this village. Map(name -> num)
-    roleSet = role.defaultRoleSet(member);
+    rule.roleSet = role.defaultRoleSet(rule.member);
 
     return rule;
 };
@@ -46,26 +46,27 @@ Rule.prototype = {
         }
     },
 
-    JSONToRoleSet: function(obj){
-        m = new Map();
-        for(var name of role.roleNameList){
-            m.set(name, obj[name] ? obj[name] : 0)
-        }
-        return m;
-    },
     roleSetJSON: function(){
         o = {};
         for(var [name,n] of this.roleSet){
-            o.name = n;
+            o[name] = n;
         }
         return o;
     },
 
     toJSON: function(){
-        ret = Object.assgin({}, this);
+        ret = Object.assign({}, this);
         ret.roleSet = this.roleSetJSON();
         return ret;
     },
+};
+
+Rule.JSONToRoleMap = function(obj){
+    m = new Map();
+    for(var name of role.roleNameList){
+        m.set(name, obj[name] ? obj[name] : 0)
+    }
+    return m;
 };
 
 Rule.isRule = (obj,type)=>{
