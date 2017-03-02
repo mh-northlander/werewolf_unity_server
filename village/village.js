@@ -29,13 +29,7 @@ function Village(villageId){
 
 Village.prototype = {
     // village
-    closeVillage: function(){
-        // this func resets itself,
-        // since currently we use one global vil.
-        this.masterId = null;
-        this.users.clear();
-
-        this.rule = Rule();
+    resetVillage: function(){
         this.phase = Phase();
         this.log = [Log()];
 
@@ -65,8 +59,11 @@ Village.prototype = {
 
 
     // rule
-    updateRule: function(dayTime, dayTimeDecreasesBy, nightTime, firstNightSee, roleLackable){
-        this.rule.update(dayTime, dayTimeDecreasesBy, nightTime, firstNightSee, roleLackable);
+    updateBaseRule: function(obj){
+        this.rule.updateBase(obj);
+    },
+    updateRoleSet: function(obj){
+        this.rule.updateRoleSet(this.rule.JSONToRoleSet(obj));
     },
 
     // phase
