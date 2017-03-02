@@ -16,9 +16,9 @@ evening = require("./evening");
 function readyToShift(io, socket, village) {
     return function(){
         userId = village.socketIdToUserId(socket.id)
-        village.users[userId].readyToShift = true;
+        village.users.get(userId).readyToShift = true;
 
-        console.log(village.users[userId].name + " is ready");
+        console.log(village.users.get(userId).name + " is ready");
 
         if(village.readyToShift()){
             switch(village.phase.gamePhase){

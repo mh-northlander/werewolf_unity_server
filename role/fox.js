@@ -27,7 +27,7 @@ Fox.prototype = {
         // die when sew
         oldSaw = village.event_saw;
         village.event_saw = function(subjectId, objectId, base=[]){
-            if(Fox.isFox(village.users[objectId].role)){
+            if(Fox.isFox(village.users.get(objectId).role)){
                 base = village.event_died(objectId, base);
             }
             return oldSaw(objectId, base);
@@ -36,7 +36,7 @@ Fox.prototype = {
         // won't die when bited
         oldBited = village.event_bited;
         village.event_bited = function(subjectId, objectId, base=[]){
-            if(Fox.isFox(village.users[objectId].role)){
+            if(Fox.isFox(village.users.get(objectId).role)){
                 return base;
             }
             return oldBited(subjectId, objectId, base=[]);

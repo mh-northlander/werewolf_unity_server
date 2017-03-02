@@ -16,11 +16,11 @@ GamePhaseNight = require('../village/phase').GamePhase.NIGHT;
 function action(io, socket, village){
     return function(act){
         userId = village.socketIdToUserId(socket.id);
-        user = village.users[userId];
+        user = village.users.get(userId);
 
         resp = user.role.evalActionNight(village, userId, act);
         if(resp && !resp=={}){
-            io.to(village.users[userId].chatRoom).emit("actionResult", resp);
+            io.to(village.users.get(userId).chatRoom).emit("actionResult", resp);
         }
     };
 };
@@ -45,9 +45,6 @@ function begin(io, village){
         dayCount:  phase.dayCount,
         timeCount: phase.secCount,
     });
-
-    // reset
-    village.actionStack = {};
 
     // action candidates
     candidatesMap = village.getCandidatesMap()

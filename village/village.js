@@ -15,14 +15,14 @@ function Village(villageId){
 
     village.Id = villageId;
     village.masterId = null;
-    village.users = {};
+    village.users = new Map();
     village.rule = Rule();
 
     village.phase = Phase();
     village.log = [Log()];
-    village.voteStack = {};
 
-    village.actionStack = {};
+    village.voteMap = new Map();
+    village.actionMap = new Map();
 
     return village;
 }
@@ -33,30 +33,36 @@ Village.prototype = {
         // this func resets itself,
         // since currently we use one global vil.
         this.masterId = null;
-        this.users = {};
+        this.users.clear();
+
+        this.rule = Rule();
+        this.phase = Phase();
+        this.log = [Log()];
+
+        this.voteMap.clear();
+        this.actionMap.clear();
     },
 
     // user
     masterUser: function(){
-        return this.masterId ? null : this.users[masterId];
+        return this.masterId ? null : this.users.get(masterId);
     },
     addUser: function(userId, socketId, name){
-        if(userId in this.users){ return; }
+        if(this.users.has(userId)){ // update
+            this.users.get(userId).name = name;
+            this.users.get(userId).socketId = socketId;
+        } else {                    // add
+            this.users.set(userId, User(userId, name, socketId))
+        }
 
-        this.users[userId] = User(userId, name, socketId);
         if(this.masterId == null){
             this.masterId = userId;
         }
     },
-    updateUser: function(userId, socketId, name){
-        if(!(userId in this.users)){ return; }
-
-        this.users[userId].name = name;
-        this.users[userId].socketId = socketId;
-    },
     removeUser: function(userId){
-        delete this.users[userId];
+        this.users.delete(userId);
     },
+
 
     // rule
     updateRule: function(dayTime, dayTimeDecreasesBy, nightTime, firstNightSee, roleLackable){
@@ -65,9 +71,9 @@ Village.prototype = {
 
     // phase
     readyToShift: function(){
-        // everyone ready except deads
-        for(key in this.users){
-            if(this.users[key].alive && !this.users[key].readyToShift){
+        for(var [id, user] of this.users){
+            // alive but not ready
+            if(user.alive && !user.readyToShift){
                 return false;
             }
         }
@@ -79,86 +85,90 @@ Village.prototype = {
         this.phase.phaseShift(nPhase, this.rule.dayTime, this.rule.nightTime);
 
         // reset flg
-        Object.keys(this.users).forEach((key)=>{
-            this.users[key].readyToShift = false;
-        });
+        for(var [k,v] of this.users){
+            v.readyToShift = false;
+        }
 
         return this.phase
     },
 
     // action
-    getCandidatesMap: function(){ // => [userId]
-        Object.keys(this.users).reduce((ret,userId)=>{
-            if(this.users[userId].alive && this.users[userId].role.actionCandidates){
-                list = this.users[userId].role.actionCandidates(this, userId);
-                if(!list == []){
-                    ret[userId] = list;
+    getCandidatesMap: function(){ // => map{ userId: [userId] }
+        ret = {};
+        for(var [id,user] of this.users){
+            if(user.alive && user.role.actionCandidates){
+                list = user.role.actionCandidates(this, id);
+                if(list != []){
+                    ret[id] = list;
                 }
             }
-            return ret;
-        }, {})
+        }
+        return ret;
     },
-    getResultMap: function(){ // => { userId, result, }
-        Object.keys(this.users).reduce((ret,userId)=>{
-            if(this.users[userId].alive && this.users[userId].role.actionResult){
-                res = this.users[userId].role.actionResult(this);
-                if(!res == {}){
-                    ret[userId] = res;
+    getResultMap: function(){ // => map{ userId: { userId, result,} }
+        ret = {};
+        for(var [id,user] of this.users){
+            if(user.alive && user.role.actionResult){
+                res = user.role.actionResult(this);
+                if(res != {}){
+                    ret[id] = res;
                 }
             }
-            return ret;
-        }, {})
+        }
+        return ret;
     },
-    evalActionMorning: function(){ // => [userId]
+    evalActionMorning: function(){ // => {deadIds: [userId], }
         if(this.phase.dayCount == 1){ return { deadIds:[] }; }
 
         deadIds = [];
         // see
-        if(this.actionStack["see"]){
-            for(e of this.actionStack["see"]){
-                deadIds = deadIds.concat(this.event_saw(e.subjectUserId, e.objectUserId));
+        if(this.actionMap.has("see")){
+            for(act of this.actionMap.get("see")){
+                deadIds = deadIds.concat(this.event_saw(act.subjectId, act.objectId));
             }
         }
 
         //// bite
-        if(this.actionStack["bite"]){
+        if(this.actionMap.has("bite")){
             // summarize all bite action
-            summary = {} // objectId -> { powerSum, subjectIds, subjectPower }
-            for(e of this.actionStack["bite"]){
-                if(summary[e.objectId]){ // init
-                    summary[e.objectId] = {
+            let summary = new Map();
+            for(act of this.actionMap.get("bite")){
+                if(summary.has(act.objectId)){ // init
+                    summary.set(act.objectId, {
                         powerSum     : 0,
                         subjectPower : 0,
                         subjectIds   : [],
-                    };
+                    });
                 }
-                summary[e.objectId].powerSum += e.power
-                if       (e.power >  summary[e.objectId].subjectPower){
-                    summary[e.objectId].subjectIds   = [e.subjectId];
-                    summary[e.objectId].subjectPower = e.power;
-                } else if(e.power == summary[e.objectId].subjectPower){
-                    summary[e.objectId].subjectIds.push(e.subjectId);
+                summary.get(act.objectId).powerSum += act.power
+                if       (act.power >  summary.get(act.objectId).subjectPower){
+                    summary.get(act.objectId).subjectIds   = [act.subjectId];
+                    summary.get(act.objectId).subjectPower = act.power;
+                } else if(act.power == summary.get(act.objectId).subjectPower){
+                    summary.get(act.objectId).subjectIds.push(act.subjectId);
                 }
             }
-            // search victim
+            // pick victim
             objectIds = [];
             maxPower = 0;
-            for(objectId in summary){
-                if       (summary[objectId].powerSum >  maxPower){
-                    objectIds = [objectId];
-                    maxPower  = summary[objectId].powerSum;
-                } else if(summary[objectId].powerSum == maxPower){
-                    objectIds.push(objectId);
+            for(var [k,v] of summary){
+                if       (v.powerSum >  maxPower){
+                    objectIds = [k];
+                    maxPower  = v.powerSum;
+                } else if(v.powerSum >  maxPower){
+                    objectIds.push(k);
                 }
             }
             // random choice if tie
-            objectId   = objectIds[Math.floor(Math.random() * objectIds.length)];
-            subjectIds = summary[objectId];
-            deadIds = deadIds.concat(this.event_bited(
-                subjectIds[Math.floor(Math.random() * subjectIds.length)], objectId));
+            objectId   = objectIds [Math.floor(Math.random() * objectIds.length)];
+            subjectIds = summary.get(objectId).subjectIds;
+            subjectId  = subjectIds[Math.floor(Math.random() * subjectIds.length)];
+            deadIds = deadIds.concat(this.event_bited(subjectId, objectId));
         }
 
-        //
+        // reset
+        this.actionMap.clear();
+
         return {
             deadIds: deadIds,
         };
@@ -175,78 +185,101 @@ Village.prototype = {
         return this.event_died(objectId, base);
     },
     event_died: function(objectId, base=[]){
-        this.users[objectId].alive = false;
+        this.users.get(objectId).alive = false;
         return base.concat([objectId]);
     },
 
     // vote
-    voteCandidates: function(subjectUserId){ // => [userId]
-        return this.listMembersWithCondition({
+    voteCandidates: function(subjectId){ // => [userId]
+        return this.listUserIdsWithCondition({
             alive  : true,
-            except : [subjectUserId],
+            except : [subjectId],
         })
     },
-    addVote: function(subjectUserId, vote){ // => _
+    addVote: function(subjectId, vote){ // => _
+        // voteStack: Map(objectId: {subjectIds, count})
         // vote: [userId]
         for(userId of vote){
-            if(!this.voteStack[userId]){
-                this.voteStack[userId] = 0;
-            }
-            this.voteStack[userId] += 1;
+            if(!this.voteMap.has(userId)){ this.voteMap.set(userId, {
+                subjectIds : [],
+                count      : 0,
+            }); }
+
+            this.voteMap.get(userId).count += 1;
+            this.voteMap.get(userId).subjectIds.push(subjectId);
         }
     },
-    evalVote: function(){ // => {executedId:userId, deadIds:[userId]}
+    evalVote: function(){ // => { executedId:userId, deadIds:[userId] }
+        // uniquerify
+        for(var [k,v] of this.voteMap){
+            v.subjectIds = v.subjectIds.filter((e,i,a)=>{
+                return a.indexOf(e) == i;
+            });
+        }
+
         maxVotes = 0;
-        executedIds = [];
-        for(userId in this.voteStack){
-            if       (this.voteStack[userId] >  maxVotes){
-                executedIds = [userId];
-                maxVotes = this.voteStack[userId];
-            } else if(this.voteStack[userId] == maxVotes){
-                executedIds.push(userId);
+        eIds = [];
+        for(var [k,v] of this.voteMap){
+            if       (v.count >  maxVotes){
+                eIds = [k];
+                maxVotes = v.count;
+            } else if(v.count == maxVotes){
+                eIds.push(k);
             }
         }
 
-        executedId = executedIds[Math.floor(Math.random() * executedIds.length)];
-        deads      = this.event_executed(executedId);
-        idx        = deads.indexOf(executedId);
-        deads      = deads.splice(idx, 1);
+        eId   = eIds[Math.floor(Math.random() * eIds.length)];
+        deads = this.event_executed(eId);
+        idx   = deads.indexOf(eId);
+        deads = deads.splice(idx, 1);
+
+        this.voteMap.clear(); // reset
         return {
-            executedId   : executedId,
+            executedId   : eId,
             deadIds      : deads,
         };
     },
 
     // util
-    listMembersWithCondition: function(cond){ // => [userId]
+    listUserIdsWithCondition: function(cond){ // => [userId]
         /* condition
            alive  : bool
            except : [userId]
 
-           notWolf : bool
+           exFunc  : user => bool // take if true
         */
-        return Object.keys(this.users).reduce((ret,userId)=>{
-            user = this.users[userId];
+        ret = [];
+        for(var [id,user] of this.users){
+            if(cond.alive  && !user.alive){ continue; }
+            if(cond.except && cond.except.indexOf(id)>=0){ continue; }
+            if(cond.exFunc && !cond.exFunc(user.role)){ continue; }
 
-            if(cond.alive  && !user.alive){ return ret; }
-            if(cond.except && cond.except.indexOf(userId) >= 0 ){ return ret; }
-
-            if(cond.notWold && user.role.species==role.common.type.WEREWOLF){ return ret; }
-
-            ret.push(userId);
-            return ret;
-        }, []);
+            ret.push(id);
+        }
+        return ret;
+    },
+    listUsers: function(){ // => [{id,name}]
+        ret = [];
+        for(var [id,user] of this.users){
+            ret.push({
+                id   : id,
+                name : user.name,
+            });
+        }
+        return ret;
     },
 
     socketIdToUserId: function(socketId){ // => userId
-        for(key in this.users){
-            if(this.users[key].socketId == socketId){
-                return key;
-            }
+        for(var [id,user] of this.users){
+            if(user.socketId == socketId){ return id; }
         }
+        console.log("error: no user has socketId " + socketId);
     },
     userIdToSocketId: function(userId){ // => socketId
-        return this.users[userId].socketId;
+        if(this.users.has(userId)){
+            return this.users.get(userId).socketId;
+        }
+        console.log("error: no user has id " + userId);
     },
 };
 

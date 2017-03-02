@@ -27,17 +27,25 @@ Werewolf.prototype = {
     fromMedium : common.type.WEREWOLF,
 
     actionCandidates: function(village, selfId){
-        return village.listMembersWithCondition({
-            alive   : true,
-            notWolf : true,
-            except  : [selfId],
+        // first night
+        if(village.phase.dayCount == 0){ return []; }
+
+        return village.listUserIdsWithCondition({
+            alive  : true,
+            except : [selfId],
+            exFunc : userRole => {
+                return (userRole.chatGroup == this.chatGroup);
+            },
         })
     },
 
     evalActionNight: function(village, userId, act){
         // act: { type:"bite", userId, power }
-        if(!village.actionStack["bite"]){ village.actionStack["bite"] = []; }
-        village.actionStack["bite"].push({
+        // first night
+        if(village.phase.dayCount == 0){ return {}; }
+
+        if(!village.actionMap.has("bite")){ village.actionMap.set("bite", []); }
+        village.actionMap.get("bite").push({
             subjectId : userId,
             objectId  : act.userId,
             power     : act.power,

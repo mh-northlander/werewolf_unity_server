@@ -26,18 +26,24 @@ Guard.prototype = {
     fromMedium : common.type.HUMAN,
 
     actionCandidates: function(village, selfId){
+        // first night
+        if(village.phase.dayCount == 0){ return []; }
+
         exp = [selfId];
         if(this.log.length > 0){
             exp.push(this.log[this.log.length-1].userId)
         }
 
-        return village.listMembersWithCondition({
+        return village.listUserIdsWithCondition({
             alive  : true,
             except : exp,
         })
     },
 
     evalActionNight: function(village, userId, act){
+        //
+        if(village.phase.dayCount == 0){ return {}; }
+
         // act: { type:"guard", userId }
         // log
         this.log.push({ userId: act.userId });

@@ -1,7 +1,8 @@
 // exports
-module.exports = Rule
+module.exports = Rule;
 
 // imports
+firstNightSee = require("../role/seer").firstNightSee;
 
 
 // rule
@@ -13,7 +14,7 @@ function Rule(){
 
     rule.nightTime = 1;
 
-    rule.firstNightSee = Rule.firstNightSee.Given;
+    rule.firstNightSee = firstNightSee.Given;
     rule.roleLackable = false;
 
     return rule;
@@ -29,12 +30,6 @@ Rule.prototype = {
         if(firstNightSee){ this.firstNightSee = firstNightSee; }
         if(roleLackable){ this.roleLackable = roleLackable; }
     },
-};
-
-Rule.firstNightSee = {
-    None   : "firstNightSee_none",
-    Choice : "firstNightSee_choice",
-    Given  : "firstNightSee_given",
 };
 
 Rule.isRule = (obj,type)=>{

@@ -17,14 +17,7 @@ function joinRoom(io, socket, village){
         village.addUser(data.userId, socket.id, data.name);
 
         // list of {id,name}
-        io.sockets.emit("memberChanged",
-                        Object.keys(village.users).reduce((ret,id)=>{
-                            ret.push({
-                                id   : id,
-                                name : village.users[id].name,
-                            });
-                            return ret;
-                        }, []));
+        io.sockets.emit("memberChanged", village.listUsers());
     }
 };
 
@@ -35,14 +28,7 @@ function exitRoom(io, socket, village){
         village.removeUser(userId);
 
         // list of {id,name}
-        io.sockets.emit("memberChanged",
-                        Object.keys(village.users).reduce((ret,id)=>{
-                            ret.push({
-                                id   : id,
-                                name : village.users[id].name,
-                            });
-                            return ret;
-                        }, []));
+        io.sockets.emit("memberChanged", village.listUsers());
     }
 };
 
@@ -58,16 +44,15 @@ function changeRule(io, socket, village){
 function startGame(io, village){
     return function(){
         // set role : TODO
-        for(var userId in village.users){
-            var userSocketId = village.users[userId].socketId;
-            var userRole = village.users[userId].role;
-            io.to(userSocketId).emit('roleAck', userRole.type);
+        for(var [userId,user] of village.users){
+            io.to(user.socketId).emit("toleAck", user.role.type);
+
             if(userRole.chatType == role.common.chatType.PERSONAL){
-                io.sockets.sockets[userSocketId].join(userId);
+                io.sockets.sockets[user.socketId].join(userId);
                 io.to(userId).emit("debug", userId + "はぼっち村の人です");
-            } else {
-                io.sockets.sockets[userSocketId].join(userRole.chatGroup);
-                io.to(userRole.chatGroup).emit("debug", "あなたは" + userRole + "です");
+            } else if(user.role.chatType == role.common.chatType.GROUP){
+                io.sockets.sockets[user.socketId].join(user.role.chatGroup);
+                io.to(user.role.chatGroup).emit("debug", "あなたは" + user.role.type + "です");
             }
         }
 

@@ -19,7 +19,7 @@ function vote(io, socket, village){
         console.log(vote)
         userId = village.socketIdToUserId(socket.id);
 
-        if(!village.users[userId].readyToShift){
+        if(!village.users.get(userId).readyToShift){
             village.addVote(userId, vote);
         }
 
@@ -40,9 +40,9 @@ function begin(io, village){
     });
 
     // vote candidate
-    for(userId of Object.keys(village.users)){
-        candidates = village.voteCandidates(userId);
-        io.to(village.userIdToSocketId(userId)).emit("voteCandidates", candidates);
+    for(var [id,user] of village.users){
+        candidates = village.voteCandidates(id);
+        io.to(village.userIdToSocketId(id)).emit("voteCandidates", candidates);
     }
 };
 
