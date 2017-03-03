@@ -14,6 +14,7 @@ function Guard(){
     Object.assign(guard, Role(Guard.Name));
 
     guard.guardingId = null;
+    guard.log = [];
 
     return guard;
 }
@@ -40,13 +41,13 @@ Guard.prototype = {
         })
     },
 
-    evalActionNight: function(village, userId, act){
+    evalActionNight: function(village, selfId, act){
         //
         if(village.phase.dayCount == 0){ return {}; }
 
         // act: { type:"guard", userId }
         // log
-        this.log.push({ userId: act.userId });
+        this.log.push(act.userId);
         this.guardingId = act.userId;
 
         return {};
@@ -60,7 +61,7 @@ Guard.prototype = {
             }
             return oldBited(subjectUserId, objectUserId, base=[]);
         };
-    }
+    },
 }
 
 // isGuard

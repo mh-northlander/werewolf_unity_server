@@ -17,9 +17,8 @@ function Madman(){
 }
 
 Madman.prototype = {
-    team   : common.type.WEREWOLF,
-    species : common.type.HUMAN,
-
+    team       : common.type.WEREWOLF,
+    species    : common.type.HUMAN,
     fromSeer   : common.type.HUMAN,
     fromMedium : common.type.HUMAN,
 }

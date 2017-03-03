@@ -17,13 +17,12 @@ function Medium(){
 }
 
 Medium.prototype = {
-    team    : common.type.HUMAN,
-    species : common.type.HUMAN,
-
+    team       : common.type.HUMAN,
+    species    : common.type.HUMAN,
     fromSeer   : common.type.HUMAN,
     fromMedium : common.type.HUMAN,
 
-    actionResult: function(village){
+    actionResult: function(village, selfId){
         // first night
         if(village.phase.dayCount == 0){ return {}; }
 

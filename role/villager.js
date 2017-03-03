@@ -17,9 +17,8 @@ function Villager(){
 }
 
 Villager.prototype = {
-    team   : common.type.HUMAN,
-    species : common.type.HUMAN,
-
+    team       : common.type.HUMAN,
+    species    : common.type.HUMAN,
     fromSeer   : common.type.HUMAN,
     fromMedium : common.type.HUMAN,
 }

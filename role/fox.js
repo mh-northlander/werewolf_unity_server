@@ -17,9 +17,8 @@ function Fox(){
 }
 
 Fox.prototype = {
-    team    : common.type.OTHER,
-    species : common.type.OTHER,
-
+    team       : common.type.OTHER,
+    species    : common.type.OTHER,
     fromSeer   : common.type.HUMAN,
     fromMedium : common.type.HUMAN,
 
@@ -41,7 +40,7 @@ Fox.prototype = {
             }
             return oldBited(subjectId, objectId, base=[]);
         };
-    }
+    },
 }
 
 // isFox

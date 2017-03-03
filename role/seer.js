@@ -13,13 +13,14 @@ function Seer(){
     var seer = Object.create(Seer.prototype);
     Object.assign(seer, Role(Seer.Name))
 
+    seer.log = [];
+
     return seer;
 }
 
 Seer.prototype = {
-    team   : common.type.HUMAN,
-    species : common.type.HUMAN,
-
+    team       : common.type.HUMAN,
+    species    : common.type.HUMAN,
     fromSeer   : common.type.HUMAN,
     fromMedium : common.type.HUMAN,
 
@@ -27,46 +28,57 @@ Seer.prototype = {
         // first night
         if(village.phase.dayCount == 0){
             switch(village.rule.firstNightSee){
-            case Seer.firstNightSee.None:   return [];
-            case Seer.firstNightSee.Given:  return village.listUserIdsWithCondition({
-                alive   : true,
-                exFunc  : userRole => {
-                    return (role.fromSeer == common.type.HUMAN) &&
-                        (role.Fox.isFox(userRole));
-                },
-            });
+            case Seer.firstNightSee.None:
+            case Seer.firstNightSee.Given:  return [];
             case Seer.firstNightSee.Choice: break;
             default:
-                console.log("error: seer firstNight");
+                console.log("error: invalid first night seer");
             }
         }
 
         return village.listUserIdsWithCondition({
             alive  : true,
-            except : this.log.reduce((ret,val)=>{
-                ret.push(val.userId);
+            except : this.log.reduce((ret,userId)=>{
+                ret.push(userId);
                 return ret
             }, [selfId])
         });
     },
 
-    evalActionNight: function(village, userId, act){
+    actionResult: function(village, selfId){
+        if(village.phase.dayCount != 0){ return {}; }
+        if(village.rule.firstNightSee != Seer.firstNightGiven){ return {}; }
+
+        cIds = village.listUserIdsWithCondition({
+            alive   : true,
+            except  : [selfId],
+            exFunc  : userRole => {
+                return (role.fromSeer != common.type.WEREWOLF) &&
+                    (role.Fox.isFox(userRole));
+            },
+        });
+        cId = cIds[Math.floor(Math.random() * cIds.length)];
+
+        return evalActionNight(village, selfId, { type: "see", userId: cid });
+    },
+
+    evalActionNight: function(village, selfId, act){
         // act: { type:"see", userId }
         // log
-        this.log.push({ userId: act.userId });
+        this.log.push(act.userId);
 
         if(!village.actionMap.has("see")){ village.actionMap.set("see", []); }
         village.actionMap.get("see").push({
-            subjectId : userId,
+            subjectId : selfId,
             objectId  : act.userId,
         });
 
         seerRes = village.users.get(act.userId).role.fromSeer;
         return {
             objectId : act.userId,
-            result   : seerRes==common.type.WEREWOLF ? seerRes : commontype.HUMAN,
+            type     : seerRes==common.type.WEREWOLF ? seerRes : commontype.HUMAN,
         }
-    }
+    },
 }
 
 //

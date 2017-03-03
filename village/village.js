@@ -102,11 +102,11 @@ Village.prototype = {
         }
         return ret;
     },
-    getResultMap: function(){ // => map{ userId: { userId, result,} }
+    getResultMap: function(){ // => map{ userId: result{} }
         ret = {};
         for(var [id,user] of this.users){
             if(user.alive && user.role.actionResult){
-                res = user.role.actionResult(this);
+                res = user.role.actionResult(this, id);
                 if(res != {}){
                     ret[id] = res;
                 }

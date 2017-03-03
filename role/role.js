@@ -11,27 +11,41 @@ function Role(type = "Role"){
 
     role.type = type;
 
-    role.log = [];
-
     return role;
 }
 
 Role.prototype = {
+    // team represents how to win. (human / werewolf/ other)
+    // team.other : TODO
     team    : common.type.NONE,
+
+    // speacies represents head count for game-end check.
+    // speacies.other will be ignored
     species : common.type.NONE,
 
+    // sawAs represents how ze looks from seers
+    fromSeer : common.type.NONE,
+
+    // sawAs represents how ze looks from mediums
+    fromMedium : common.type.NONE,
+
+    // these represents which chat room ze will join
+    // chatGroup will be used only if chatType == GROUP
     chatType  : common.chatType.PERSONAL,
     chatGroup : "none",
 
-    fromSeer   : common.type.NONE,
-    fromMedium : common.type.NONE,
-
-    // actionCandidates is a function:(village, subjectId) => [userId]. null if not necessary
+    // actionCandidates returns options for a night action.
+    // type: (village, selfId) => [userId].
+    // set null function or return [] to do nothing
     actionCandidates: null,
-    // actionResult returns result for definite action. null if not necessary
+
+    // actionResult returns result for definite action.
+    // type: (village, selfId) => result { subjectId, objectId, type, .. }.
+    // set null function or return {} to do nothing
     actionResult: null,
 
-    // evalActionNight returns result of action and/or stack it to fire event
+    // evalActionNight returns result of action and/or stack it until morning
+    // return {} to do nothing in the night (stacking still work)
     evalActionNight: (village, userId, act) => { return {}; },
 
     // mountEvent mounts event functions

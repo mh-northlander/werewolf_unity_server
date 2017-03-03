@@ -17,14 +17,13 @@ function Werewolf(){
 }
 
 Werewolf.prototype = {
-    team    : common.type.WEREWOLF,
-    species : common.type.WEREWOLF,
+    team       : common.type.WEREWOLF,
+    species    : common.type.WEREWOLF,
+    fromSeer   : common.type.WEREWOLF,
+    fromMedium : common.type.WEREWOLF,
 
     chatType  : common.chatType.GROUP,
     chatGroup : "werewolf",
-
-    fromSeer   : common.type.WEREWOLF,
-    fromMedium : common.type.WEREWOLF,
 
     actionCandidates: function(village, selfId){
         // first night
@@ -39,24 +38,22 @@ Werewolf.prototype = {
         })
     },
 
-    evalActionNight: function(village, userId, act){
+    evalActionNight: function(village, selfId, act){
         // act: { type:"bite", userId, power }
         // first night
         if(village.phase.dayCount == 0){ return {}; }
 
-        if(!village.actionMap.has("bite")){ village.actionMap.set("bite", []); }
-        village.actionMap.get("bite").push({
-            subjectId : userId,
-            objectId  : act.userId,
-            power     : act.power,
-        });
-
-        return {
-            subjectId : userId,
+        var ret = {
+            subjectId : selfId,
             objectId  : act.userId,
             power     : act.power,
         };
-    }
+
+        if(!village.actionMap.has("bite")){ village.actionMap.set("bite", []); }
+        village.actionMap.get("bite").push(ret);
+
+        return ret;
+    },
 }
 
 // isWerewolf
