@@ -2,6 +2,7 @@
 module.exports = Rule;
 
 // imports
+util = require("../util");
 role = require("../role/");
 
 // rule
@@ -46,6 +47,7 @@ Rule.prototype = {
         }
     },
 
+    // role set
     roleSetJSON: function(){
         o = {};
         for(var [name,n] of this.roleSet){
@@ -53,7 +55,17 @@ Rule.prototype = {
         }
         return o;
     },
+    suffledRoleList: function(){
+        a = [];
+        for(var [name,n] of this.roleSet){
+            for(var i=0; i<n; i++){
+                a.push(name);
+            }
+        }
+        return util.suffleArray(a);
+    },
 
+    // util
     toJSON: function(){
         ret = Object.assign({}, this);
         ret.roleSet = this.roleSetJSON();

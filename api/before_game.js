@@ -53,16 +53,28 @@ function changeRoleSet(io, socket, village){
 // start game
 function startGame(io, village){
     return function(){
-        // set role : TODO
-        for(var [userId,user] of village.users){
-            io.to(user.socketId).emit("toleAck", user.role.type);
+        // set role
+        roleList = village.rule.suffledRoleList();
+        idx = 0;
+        for(let [userId,user] of village.users){
+            user.role = role[roleList[idx]]();
+            io.to(user.socketId).emit("roleAck", user.role.type);
 
-            if(userRole.chatType == role.common.chatType.PERSONAL){
-                io.sockets.sockets[user.socketId].join(userId);
-                io.to(userId).emit("debug", userId + "はぼっち村の人です");
+            idx++;
+        }
+
+        // set chat room
+        for(let [userId,user] of village.users){
+            if(user.role.chatType == role.common.chatType.PERSONAL){
+                user.chatRoom = userId;
+                io.sockets.sockets[user.socketId].join(user.chatRoom);
+
+                io.to(user.chatRoom).emit("debug", userId + "はぼっち村の人です");
             } else if(user.role.chatType == role.common.chatType.GROUP){
-                io.sockets.sockets[user.socketId].join(user.role.chatGroup);
-                io.to(user.role.chatGroup).emit("debug", "あなたは" + user.role.type + "です");
+                user.chatRoom = user.role.chatGroup;
+                io.sockets.sockets[user.socketId].join(user.chatRoom);
+
+                io.to(user.chatRoom).emit("debug", "あなたは" + user.role.type + "です");
             }
         }
 
