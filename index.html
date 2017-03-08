@@ -23,8 +23,10 @@
                 <button type="button" class="btn btn-primary" id="gameStart">gameStart</button>
             </form>
             <form class="form-inline">
-                <button type="button" class="btn btn-primary" id="ready">readyToShift</button>
+                <button type="button" class="btn btn-primary" id="morningCheck">morning result check</button>
+                <button type="button" class="btn btn-primary" id="finishDisc">finish discussion</button>
                 <button type="button" class="btn btn-primary" id="vote">vote</button>
+                <button type="button" class="btn btn-primary" id="eveningCheck">evening result check</button>
             </form>
             <div id="chatLogs"></div>
         </div>
@@ -79,8 +81,14 @@
          socket.on("roleAck", function(roleName){
              appendMsg("role: " + roleName);
          });
-         $("#ready").click(function(e){
-             socket.emit("readyToShift");
+         $("#morningCheck").click(function(e){
+             socket.emit("morningResultChecked");
+         });
+         $("#finishDisc").click(function(e){
+             socket.emit("finishDiscussion");
+         });
+         $("#eveningCheck").click(function(e){
+             socket.emit("eveningResultChecked");
          });
          socket.on("debug", function(debug){
              console.log(debug);
