@@ -25,7 +25,7 @@ function vote(io, socket, village){
 
         // check
         const user = village.users.get(userId);
-        users.readyToShift = true;
+        user.readyToShift = true;
         if(village.readyToShift()){
             end(io, village);
         }
