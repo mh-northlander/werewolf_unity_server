@@ -1,5 +1,7 @@
 // export
 module.exports = {
+    EveningResultChecked: eveningResultChecked,
+
     Begin: begin,
     End  : end,
 };
@@ -9,7 +11,19 @@ module.exports = {
 const GamePhaseEvening = require('../village/phase').GamePhase.EVENING;
 const night = require('./night');
 
-// eveningResult
+// eveningResultChecked
+function eveningResultChecked(){
+    return function(){
+        const userId = village.socketIdToUserId(socket.id);
+        const user = village.users.get(userId);
+        user.readyToShift = true;
+
+        console.log("evening result checked: " + user.name);
+        if(village.readyToShift()){
+            end(io, village);
+        }
+    };
+}
 
 //// emit
 // begin

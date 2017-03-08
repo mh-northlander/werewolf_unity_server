@@ -3,12 +3,10 @@ const before_game = require("./before_game");
 const after_game  = require("./after_game");
 
 const night     = require("./night");
-// morning   = require("./morning");
-// daytime   = require("./daytime");
+const morning   = require("./morning");
+const daytime   = require("./daytime");
 const afternoon = require("./afternoon");
-// evening   = require("./evening");
-
-const shared = require("./shared");
+const evening   = require("./evening");
 
 /* // memo io
    io = require("socket.io")()               // io: Server
@@ -39,21 +37,25 @@ module.exports.mountAPIs = function(io){
 
         // common
         socket.emit('connectionEstablished', {}); // TODO: reconnection
-        socket.on('readyToShift', shared.ReadyToShift(io,socket, vil))
 
         // before game
-        socket.on('joinRoom', before_game.JoinRoom(io,socket, vil));
-        socket.on('exitRoom', before_game.ExitRoom(io,socket, vil));
+        socket.on('joinRoom',   before_game.JoinRoom(io,socket, vil));
+        socket.on('exitRoom',   before_game.ExitRoom(io,socket, vil));
         socket.on('changeRule', before_game.ChangeRule(io,socket, vil));
-        socket.on('startGame', before_game.StartGame(io, vil));
+        socket.on('startGame',  before_game.StartGame(io, vil));
+
+        // phase shift
+        socket.on("morningResultChecked", morning.MorningResultChecked(io,socket, vil));
+        socket.on("finishDiscussion",     daytime.FinishDiscussion(io,socket, vil));
+        socket.on("eveningResultChecked", evening.EveningResultChecked(io,socket, vil));
 
         // vote
-        socket.on('vote', afternoon.Vote(io,socket, vil))
+        socket.on('vote', afternoon.Vote(io,socket, vil));
 
         // chat
-        socket.on('chat',   night.Chat(io,socket, vil))
+        socket.on('chat',   night.Chat(io,socket, vil));
 
         // action
-        socket.on('action', night.Action(io,socket, vil))
+        socket.on('action', night.Action(io,socket, vil));
     });
 }

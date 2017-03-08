@@ -63,6 +63,7 @@ Village.prototype = {
         this.rule.update(obj);
     },
 
+
     // phase
     readyToShift: function(){
         for(const [id, user] of this.users){
@@ -85,6 +86,30 @@ Village.prototype = {
 
         return this.phase
     },
+
+
+    // event returns result object (morning / vote)
+    // type: ~ => { deadIds, executedId, ~ }
+    event_saw: function(subjectId, objectId, result={}){ return result; },
+    event_bited: function(subjectId, objectId, success, result={}){
+        if(success){ // bite action can fail
+            if(!result.deadIds){ result.deadIds = []; }
+            result.deadIds.push(objectIds);
+
+            return this.event_died(objectId, result);
+        }
+        return result;
+    },
+    event_executed: function(objectId, result={}){
+        result.executedId = objectId;
+        return this.event_died(objectId, result);
+    },
+    event_died: function(objectId, result={}){
+        this.users.get(objectId).alive = false;
+        return result;
+    },
+    event_morning: function(result={}){ return result; },
+
 
     // action
     getCandidatesMap: function(){ // => map{ userId: [userId] }
@@ -170,27 +195,6 @@ Village.prototype = {
         return morningResult;
     },
 
-    // event returns result object (morning / vote)
-    // type: ~ => { deadIds, executedId, ~ }
-    event_saw: function(subjectId, objectId, result={}){ return result; },
-    event_bited: function(subjectId, objectId, success, result={}){
-        if(success){ // bite action can fail
-            if(!result.deadIds){ result.deadIds = []; }
-            result.deadIds.push(objectIds);
-
-            return this.event_died(objectId, result);
-        }
-        return result;
-    },
-    event_executed: function(objectId, result={}){
-        result.executedId = objectId;
-        return this.event_died(objectId, result);
-    },
-    event_died: function(objectId, result={}){
-        this.users.get(objectId).alive = false;
-        return result;
-    },
-    event_morning: function(result={}){ return result; },
 
     // vote
     voteCandidates: function(subjectId){ // => [userId]
@@ -239,6 +243,7 @@ Village.prototype = {
 
         return voteResult;
     },
+
 
     // util
     listUserIdsWithCondition: function(cond){ // => [userId]

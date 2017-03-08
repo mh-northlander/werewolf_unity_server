@@ -8,7 +8,6 @@ module.exports = {
 
 // imports
 const GamePhaseAfternoon = require('../village/phase').GamePhase.AFTERNOON;
-const shared = require('./shared');
 const evening = require('./evening');
 
 
@@ -20,12 +19,16 @@ function vote(io, socket, village){
                     " votes to " + village.users.get(vote[0]).name);
 
         const userId = village.socketIdToUserId(socket.id);
-        if(!village.users.get(userId).readyToShift){
+        if(!village.users.get(userId).readyToShift){ // prevent multi-vote
             village.addVote(userId, vote);
         }
 
         // check
-        shared.ReadyToShift(io,socket,village)();
+        const user = village.users.get(userId);
+        users.readyToShift = true;
+        if(village.readyToShift()){
+            end(io, village);
+        }
     };
 };
 

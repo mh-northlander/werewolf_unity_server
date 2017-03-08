@@ -1,5 +1,7 @@
 // export
 module.exports = {
+    MorningResultChecked: morningResultChecked,
+
     Begin: begin,
     End  : end,
 };
@@ -8,6 +10,20 @@ module.exports = {
 const GamePhaseMorning = require('../village/phase').GamePhase.MORNING;
 const dayTime = require("./daytime");
 
+
+// morningResultChecked
+function morningResultChecked(io, socket, village){
+    return function(){
+        const userId = village.socketIdToUserId(socket.id);
+        const user = village.users.get(userId);
+        user.readyToShift = true;
+
+        console.log("morning result checked: " + user.name);
+        if(village.readyToShift()){
+            end(io, village);
+        }
+    };
+}
 
 // begin
 function begin(io, village){

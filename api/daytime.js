@@ -1,5 +1,7 @@
 // export
 module.exports = {
+    FinishDiscussion: finishDiscussion,
+
     Begin: begin,
     End  : end,
 };
@@ -7,6 +9,21 @@ module.exports = {
 // import
 const GamePhaseDaytime = require('../village/phase').GamePhase.DAYTIME;
 const afternoon = require("./afternoon");
+
+
+// finishDiscussion
+function finishDiscussion(io, socket, village){
+    return function(){
+        const userId = village.socketIdToUserId(socket.id);
+        const user = village.users.get(userId);
+        user.readyToShift = true;
+
+        console.log("finish discussion: " + user.name);
+        if(village.readyToShift()){
+            end(io, village);
+        }
+    };
+}
 
 
 // begin

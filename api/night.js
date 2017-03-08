@@ -7,7 +7,6 @@ module.exports = {
 };
 
 // import
-const shared = require("./shared");
 const morning = require("./morning");
 const GamePhaseNight = require('../village/phase').GamePhase.NIGHT;
 
