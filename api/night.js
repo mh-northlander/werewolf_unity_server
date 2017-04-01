@@ -57,14 +57,12 @@ function begin(io, village){
 
     // action candidates
     const candidatesMap = village.getCandidatesMap();
-    console.log(candidatesMap);
     for(const [id, list] of candidatesMap){
         io.to(village.userIdToSocketId(id)).emit("actionCandidates", list);
     }
 
     // action result (for difinite action)
     const resultMap = village.getResultMap();
-    console.log(resultMap);
     for(const [id, res] of resultMap){
         io.to(village.userIdToSocketId(id)).emit("actionResult", res);
     }

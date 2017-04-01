@@ -29,6 +29,7 @@
                 </select>
                 <button type="button" class="btn btn-primary" id="vote">vote</button>
                 <button type="button" class="btn btn-primary" id="evening_check">evening check</button>
+                <button type="button" class="btn btn-primary" id="evening_chat">sending chat</button>
             </form>
 
             <form id="form-action" class="form-inline">
@@ -142,6 +143,22 @@
              console.log(result);
              appendLog("We excute " + id2nameMap[result.executedId] + ", and We hope the village become peace");
          })
+
+         // chat
+         $("#evening_chat").click(function(e){
+            const message = $("#name_form").val();
+            if(message == ""){
+                appendLog("input message");
+            } else {
+                $("#name_form").val("");
+                socket.emit("chat", {message: message});
+                e.preventDefault();
+            }
+         });
+
+         socket.on("chat")
+
+
 
          // action
          socket.on("actionCandidates", function(ids){
