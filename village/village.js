@@ -133,7 +133,9 @@ Village.prototype = {
         return map;
     },
     evalActionMorning: function(){ // => {deadIds: [userId], }
-        if(this.phase.dayCount === 1){ return {}; } // first morning
+        if(this.phase.dayCount === 1){ return {
+            deadIds: []
+        }; } // first morning
 
         let morningResult = {}
         // see

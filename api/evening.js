@@ -12,7 +12,7 @@ const GamePhaseEvening = require('../village/phase').GamePhase.EVENING;
 const night = require('./night');
 
 // eveningResultChecked
-function eveningResultChecked(){
+function eveningResultChecked(io, socket, village){
     return function(){
         const userId = village.socketIdToUserId(socket.id);
         const user = village.users.get(userId);

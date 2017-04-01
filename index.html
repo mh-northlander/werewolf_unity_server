@@ -134,12 +134,13 @@
          })
          $("#vote").click(function(e){
              const voteId = document.getElementById("vote_cands").value;
-             if(id!="" || id!="none"){ socket.emit("vote", [voteId]); }
+            //  if(id!="" || id!="none"){ socket.emit("vote", [voteId]); }
+             socket.emit("vote", [voteId]);
              $("#vote_cands").html("");
          });
          socket.on("voteResult", function(result){
              console.log(result);
-             appendLog("We excute " + idToNameMap[result.executedId] + ", and We hope the village become peace");
+             appendLog("We excute " + id2nameMap[result.executedId] + ", and We hope the village become peace");
          })
 
          // action
@@ -165,10 +166,10 @@
          //
          socket.on("morningResult", function(result){
              console.log(result);
-             let str = result.deadIds.reduce((ret,id)=>{
-                 ret += ", " + id2nameMap[id];
-                 return ret;
-             }, "");
+                 let str = result.deadIds.reduce((ret,id)=>{
+                     ret += ", " + id2nameMap[id];
+                     return ret;
+                 }, "");
              appendLog("deads" + str);
          });
 

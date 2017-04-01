@@ -49,3 +49,8 @@ function end(io, village){
     console.log("daytime end");
     afternoon.Begin(io, village);
 };
+
+function clearTimeOut(timeOutId){
+    //TODO:clearTimeOutする
+    console.log("clearTimeOutする");
+}
