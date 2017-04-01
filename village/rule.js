@@ -14,7 +14,7 @@ function Rule(){
     // modify dayTime each day for convinience
     rule.dayTimeDecreasesBy = 1;
     // time for discussion or action in the night (sec)
-    rule.nightTime = 1;
+    rule.nightTime = 600;
 
     // the first victim (NPC) can have role
     rule.roleLackable = false;
@@ -22,7 +22,7 @@ function Rule(){
     rule.firstNightSee = role.Seer.firstNightSee.Given;
 
     // set of role in this village. Map(name -> num)
-    rule.roleSet = role.defaultRoleSet(4);
+    rule.roleSet = role.defaultRoleSet(8);
 
     return rule;
 };

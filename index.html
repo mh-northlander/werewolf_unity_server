@@ -155,10 +155,10 @@
                 e.preventDefault();
             }
          });
-
-         socket.on("chat")
-
-
+         socket.on("chat", function(result){
+             console.log(result);
+             appendLog(id2nameMap[result.userId] + "さんが発言しました:" + result.message)
+         });
 
          // action
          socket.on("actionCandidates", function(ids){

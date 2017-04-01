@@ -28,16 +28,17 @@ function action(io, socket, village){
 
 // chat
 function chat(io, socket, village){
-    return function(message){
+    return function(data){
         // TODO
-        // socket.to(chatRoom).emit();
+        const userId = village.socketIdToUserId(socket.id);
+        io.to(village.users.get(userId).chatRoom).emit("chat", {userId: userId, message: data.message});
     };
 };
 
 // end night (for debug)
 function endNight(io, socket, village){
     return function(){
-        clearTimeOut(timeOutId);
+        clearTimeout(timeOutId);
         end(io, village);
     };
 }
