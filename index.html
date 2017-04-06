@@ -200,6 +200,11 @@
              appendLog("win: " + str);
          });
 
+         socket.on("error", function(data){
+             console.log(data);
+             appendLog("status:"+data.statusCode+" "+data.message);
+         })
+
         </script>
     </body>
 </html>

@@ -20,15 +20,17 @@ const util = require("../util");
 // action
 function action(io, socket, village){
     return function(act){
-        const userId = village.socketIdToUserId(socket.id);
-        const user = village.users.get(userId);
+        if(phaseCheck(io, socket, village, "action")){
+            const userId = village.socketIdToUserId(socket.id);
+            const user = village.users.get(userId);
 
-        console.log("act of " + user.name + ":");
-        console.log(act);
+            console.log("act of " + user.name + ":");
+            console.log(act);
 
-        const resp = user.role.evalActionNight(village, userId, act);
-        if(!util.isEmptyObj(resp)){
-            io.to(village.users.get(userId).chatRoom).emit("actionResult", resp);
+            const resp = user.role.evalActionNight(village, userId, act);
+            if(!util.isEmptyObj(resp)){
+                io.to(village.users.get(userId).chatRoom).emit("actionResult", resp);
+            }
         }
     };
 };
@@ -36,18 +38,22 @@ function action(io, socket, village){
 // chat
 function chat(io, socket, village){
     return function(data){
-        // TODO
-        const userId = village.socketIdToUserId(socket.id);
-        io.to(village.users.get(userId).chatRoom).emit(
-            "chat", { userId: userId, message: data.message });
+        if(phaseCheck(io, socket, village, "chat")){
+            // TODO
+            const userId = village.socketIdToUserId(socket.id);
+            io.to(village.users.get(userId).chatRoom).emit(
+                "chat", { userId: userId, message: data.message });
+        }
     };
 };
 
 // end night (for debug)
 function endNight(io, socket, village){
     return function(){
-        clearTimeout(timeOutId);
-        end(io, village);
+        if(phaseCheck(io, socket, village, "endNight")){
+            clearTimeout(timeOutId);
+            end(io, village);
+        }
     };
 }
 
@@ -92,3 +98,14 @@ function end(io, village){
     // TODO 未決定行動のランダム決定
     morning.Begin(io, village);
 };
+
+// validation
+function phaseCheck(io, socket, village, eventName){
+    if(village.phase.gamePhase === GamePhaseNight){
+        return true
+    } else {
+        console.log("badRequest:", eventName, "can't call at", village.phase.gamePhase, "by", village.socketIdToUserId(socket.id));
+        io.to(socket.id).emit("error", {statusCode:400, message:"badRequest: "+eventName+" can't call at "+ village.phase.gamePhase})
+        return false
+    }
+}

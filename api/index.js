@@ -32,6 +32,7 @@ const evening   = require("./evening");
 const util = require("../util")
 const village = require('../village/');
 const vil = village.Village(util.randomString(32));
+const gamePhases = village.Phase.GamePhase
 
 module.exports.mountAPIs = function(io){
     io.on("connection", function(socket){
@@ -45,7 +46,7 @@ module.exports.mountAPIs = function(io){
         socket.on('exitRoom',   before_game.ExitRoom(io,socket, vil));
         socket.on('changeName', before_game.ChangeName(io,socket, vil));
         socket.on('changeRule', before_game.ChangeRule(io,socket, vil));
-        socket.on('startGame',  before_game.StartGame(io, vil));
+        socket.on('startGame',  before_game.StartGame(io,socket, vil));
 
         // phase shift
         socket.on("morningResultChecked", morning.MorningResultChecked(io,socket, vil));
